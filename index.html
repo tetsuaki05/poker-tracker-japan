@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>POKER TRACKER JAPAN</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0b1020;
+      color: #ffffff;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans JP",
+        sans-serif;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 10px 0 4px;
+    }
+
+    .subtitle {
+      color: #9aa4bd;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .card {
+      background: #151d31;
+      border: 1px solid #293550;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .label {
+      color: #9aa4bd;
+      font-size: 12px;
+    }
+
+    .value {
+      font-size: 25px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .green {
+      color: #5ee6a7;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .main-button {
+      background: #5ee6a7;
+      color: #08130e;
+    }
+
+    .sub-button {
+      margin-top: 10px;
+      background: #1c2740;
+      color: white;
+      border: 1px solid #303d5c;
+    }
+
+    .message {
+      margin-top: 15px;
+      color: #9aa4bd;
+      text-align: center;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <h1>♠ POKER TRACKER JAPAN</h1>
+
+    <div class="subtitle">
+      日本のライブポーカー戦績管理
+    </div>
+
+    <div class="stats">
+
+      <div class="card">
+        <div class="label">大会数</div>
+        <div class="value">0</div>
+      </div>
+
+      <div class="card">
+        <div class="label">ITM率</div>
+        <div class="value">0%</div>
+      </div>
+
+      <div class="card">
+        <div class="label">ROI</div>
+        <div class="value green">0%</div>
+      </div>
+
+      <div class="card">
+        <div class="label">累計利益</div>
+        <div class="value">¥0</div>
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        戦績を記録
+      </div>
+
+      <button
+        class="main-button"
+        onclick="startRecord()">
+        📸 大会終了後の写真から記録
+      </button>
+
+      <button
+        class="sub-button"
+        onclick="manualRecord()">
+        ✏️ 手入力で記録
+      </button>
+
+    </div>
+
+    <div
+      id="message"
+      class="message">
+    </div>
+
+  </div>
+
+  <script>
+
+    function startRecord() {
+
+      document.getElementById("message").innerText =
+        "📸 写真読み取り機能はこれから追加します！";
+
+    }
+
+    function manualRecord() {
+
+      document.getElementById("message").innerText =
+        "✏️ 手入力画面はこれから作ります！";
+
+    }
+
+  </script>
+
+</body>
+</html>
