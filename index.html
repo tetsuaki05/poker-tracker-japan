@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>POKER TRACKER JAPAN</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -172,6 +179,11 @@ textarea {
   cursor: pointer;
 }
 
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cancel-button {
   width: 100%;
   margin-top: 12px;
@@ -234,66 +246,143 @@ textarea {
   .stat-value {
     font-size: 40px;
   }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
 <header>
-  <div class="logo">♠ POKER TRACKER JAPAN</div>
-  <div class="subtitle">日本のライブポーカー戦績管理</div>
+
+  <div class="logo">
+    ♠ POKER TRACKER JAPAN
+  </div>
+
+  <div class="subtitle">
+    日本のライブポーカー戦績管理
+  </div>
+
 </header>
+
 
 <section class="stats">
 
-  <div class="stat">
-    <div class="stat-label">大会数</div>
-    <div class="stat-value" id="totalGames">0</div>
-  </div>
 
   <div class="stat">
-    <div class="stat-label">ITM率</div>
-    <div class="stat-value" id="itmRate">0%</div>
+
+    <div class="stat-label">
+      大会数
+    </div>
+
+    <div
+      class="stat-value"
+      id="totalGames"
+    >
+      0
+    </div>
+
   </div>
 
-  <div class="stat">
-    <div class="stat-label">ROI</div>
-    <div class="stat-value green" id="roi">0%</div>
-  </div>
 
   <div class="stat">
-    <div class="stat-label">累計利益</div>
-    <div class="stat-value" id="profit">¥0</div>
+
+    <div class="stat-label">
+      ITM率
+    </div>
+
+    <div
+      class="stat-value"
+      id="itmRate"
+    >
+      0%
+    </div>
+
   </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      ROI
+    </div>
+
+    <div
+      class="stat-value green"
+      id="roi"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      累計利益
+    </div>
+
+    <div
+      class="stat-value"
+      id="profit"
+    >
+      ¥0
+    </div>
+
+  </div>
+
 
 </section>
 
-<h2 class="section-title">戦績を記録</h2>
+
+<h2 class="section-title">
+  戦績を記録
+</h2>
+
 
 <div class="buttons">
 
   <button
     class="main-button primary"
-    onclick="showForm()">
+    onclick="showForm()"
+  >
     ✏️ 手入力で記録
   </button>
 
 </div>
 
-<div id="formSection" class="form-section">
+
+<div
+  id="formSection"
+  class="form-section"
+>
+
 
   <div class="form-title">
     戦績を登録
   </div>
 
+
+  <!-- 大会区分 -->
+
   <div class="form-group">
 
-    <label>大会区分</label>
+    <label>
+      大会区分
+    </label>
 
-    <select id="type" onchange="changeType()">
+    <select
+      id="type"
+      onchange="changeType()"
+    >
 
       <option value="店舗トーナメント">
         店舗トーナメント
@@ -307,9 +396,17 @@ textarea {
 
   </div>
 
-  <div class="form-group" id="storeGroup">
 
-    <label>店舗</label>
+  <!-- 店舗 -->
+
+  <div
+    class="form-group"
+    id="storeGroup"
+  >
+
+    <label>
+      店舗
+    </label>
 
     <select id="storeId">
 
@@ -321,9 +418,18 @@ textarea {
 
   </div>
 
-  <div class="form-group" id="seriesGroup" style="display:none;">
 
-    <label>大会シリーズ</label>
+  <!-- 大会シリーズ -->
+
+  <div
+    class="form-group"
+    id="seriesGroup"
+    style="display:none;"
+  >
+
+    <label>
+      大会シリーズ
+    </label>
 
     <select id="seriesId">
 
@@ -335,146 +441,223 @@ textarea {
 
   </div>
 
+
+  <!-- 大会名 -->
+
   <div class="form-group">
 
-    <label>大会名</label>
+    <label>
+      大会名
+    </label>
 
     <input
       id="tournamentName"
       type="text"
-      placeholder="例：Daily Tournament / Main Event">
+      placeholder="例：Daily Tournament / Main Event"
+    >
+
   </div>
+
+
+  <!-- 開催日 / Buy-in -->
 
   <div class="grid2">
 
+
     <div class="form-group">
 
-      <label>開催日</label>
+      <label>
+        開催日
+      </label>
 
       <input
         id="date"
-        type="date">
+        type="date"
+      >
 
     </div>
 
+
     <div class="form-group">
 
-      <label>Buy-in（円）</label>
+      <label>
+        Buy-in（円）
+      </label>
 
       <input
         id="buyIn"
         type="number"
         min="0"
-        placeholder="5000">
+        placeholder="5000"
+      >
 
     </div>
 
+
   </div>
+
+
+  <!-- リエントリー / 参加人数 -->
 
   <div class="grid2">
 
+
     <div class="form-group">
 
-      <label>リエントリー回数</label>
+      <label>
+        リエントリー回数
+      </label>
 
       <input
         id="reEntry"
         type="number"
         min="0"
-        value="0">
+        value="0"
+      >
 
     </div>
 
+
     <div class="form-group">
 
-      <label>参加人数</label>
+      <label>
+        参加人数
+      </label>
 
       <input
         id="players"
         type="number"
         min="1"
-        placeholder="100">
+        placeholder="100"
+      >
 
     </div>
 
+
   </div>
+
+
+  <!-- 順位 / ITM -->
 
   <div class="grid2">
 
+
     <div class="form-group">
 
-      <label>順位</label>
+      <label>
+        順位
+      </label>
 
       <input
         id="rank"
         type="number"
         min="1"
-        placeholder="15">
+        placeholder="15"
+      >
 
     </div>
 
+
     <div class="form-group">
 
-      <label>ITM順位（入賞ライン）</label>
+      <label>
+        ITM順位（入賞ライン）
+      </label>
 
       <input
         id="itmRank"
         type="number"
         min="1"
-        placeholder="15">
+        placeholder="15"
+      >
 
     </div>
 
+
   </div>
+
+
+  <!-- 賞金 -->
 
   <div class="form-group">
 
-    <label>賞金（円）</label>
+    <label>
+      賞金（円）
+    </label>
 
     <input
       id="prize"
       type="number"
       min="0"
-      value="0">
+      value="0"
+    >
 
   </div>
+
+
+  <!-- メモ -->
 
   <div class="form-group">
 
-    <label>メモ</label>
+    <label>
+      メモ
+    </label>
 
     <textarea
       id="memo"
-      placeholder="大会の感想・反省点など"></textarea>
+      placeholder="大会の感想・反省点など"
+    ></textarea>
 
   </div>
 
+
+  <!-- 保存 -->
+
   <button
     class="save-button"
-    onclick="saveResult()">
+    onclick="saveResult()"
+  >
     💾 戦績を保存
   </button>
 
+
+  <!-- キャンセル -->
+
   <button
     class="cancel-button"
-    onclick="hideForm()">
+    onclick="hideForm()"
+  >
     キャンセル
   </button>
 
-  <div id="message" class="message"></div>
+
+  <!-- メッセージ -->
+
+  <div
+    id="message"
+    class="message"
+  ></div>
+
 
 </div>
 
+
 </div>
+
 
 <script>
+
 
 // ============================================
 // Supabase設定
 // ============================================
 
-const SUPABASE_URL = "https://whbmhkfvyhrydfmtapzh.supabase.co";
-const SUPABASE_KEY = "sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
+const SUPABASE_URL =
+  "https://whbmhkfvyhrydfmtapzh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
+
 
 const supabaseClient =
   window.supabase.createClient(
@@ -487,16 +670,24 @@ const supabaseClient =
 // 初期化
 // ============================================
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-  document.getElementById("date").value =
-    new Date().toISOString().split("T")[0];
+    document.getElementById("date").value =
+      new Date()
+        .toISOString()
+        .split("T")[0];
 
-  await loadStores();
-  await loadSeries();
-  await loadResults();
 
-});
+    await loadStores();
+
+    await loadSeries();
+
+    await loadResults();
+
+  }
+);
 
 
 // ============================================
@@ -505,11 +696,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadStores() {
 
+
   const { data, error } =
     await supabaseClient
+
       .from("poker_stores")
-      .select("id,name,location")
-      .order("name");
+
+      .select("id,name,location");
+
 
   if (error) {
 
@@ -521,27 +715,59 @@ async function loadStores() {
     );
 
     return;
+
   }
 
+
+  // ========================================
+  // 日本語の五十音順に並べ替え
+  // ========================================
+
+  data.sort((a, b) => {
+
+    return a.name.localeCompare(
+      b.name,
+      "ja"
+    );
+
+  });
+
+
   const select =
-    document.getElementById("storeId");
+    document.getElementById(
+      "storeId"
+    );
+
 
   select.innerHTML =
     '<option value="">店舗を選択してください</option>';
 
+
   data.forEach(store => {
 
-    const option =
-      document.createElement("option");
 
-    option.value = store.id;
+    const option =
+      document.createElement(
+        "option"
+      );
+
+
+    option.value =
+      store.id;
+
 
     option.textContent =
       store.location
+
         ? `${store.name}（${store.location}）`
+
         : store.name;
 
-    select.appendChild(option);
+
+    select.appendChild(
+      option
+    );
+
 
   });
 
@@ -554,35 +780,74 @@ async function loadStores() {
 
 async function loadSeries() {
 
+
   const { data, error } =
     await supabaseClient
+
       .from("tournament_series")
-      .select("id,name")
-      .order("name");
+
+      .select("id,name");
+
 
   if (error) {
 
     console.error(error);
 
+    showMessage(
+      "大会シリーズの取得に失敗しました",
+      "error"
+    );
+
     return;
+
   }
 
+
+  // ========================================
+  // 日本語順に並べ替え
+  // ========================================
+
+  data.sort((a, b) => {
+
+    return a.name.localeCompare(
+      b.name,
+      "ja"
+    );
+
+  });
+
+
   const select =
-    document.getElementById("seriesId");
+    document.getElementById(
+      "seriesId"
+    );
+
 
   select.innerHTML =
     '<option value="">大会シリーズを選択してください</option>';
 
+
   data.forEach(series => {
 
+
     const option =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
-    option.value = series.id;
 
-    option.textContent = series.name;
+    option.value =
+      series.id;
 
-    select.appendChild(option);
+
+    option.textContent =
+      series.name;
+
+
+    select.appendChild(
+      option
+    );
+
 
   });
 
@@ -595,24 +860,47 @@ async function loadSeries() {
 
 function changeType() {
 
+
   const type =
-    document.getElementById("type").value;
+    document.getElementById(
+      "type"
+    ).value;
+
 
   const storeGroup =
-    document.getElementById("storeGroup");
+    document.getElementById(
+      "storeGroup"
+    );
+
 
   const seriesGroup =
-    document.getElementById("seriesGroup");
+    document.getElementById(
+      "seriesGroup"
+    );
 
-  if (type === "店舗トーナメント") {
 
-    storeGroup.style.display = "block";
-    seriesGroup.style.display = "none";
+  if (
+    type === "店舗トーナメント"
+  ) {
+
+
+    storeGroup.style.display =
+      "block";
+
+
+    seriesGroup.style.display =
+      "none";
+
 
   } else {
 
-    storeGroup.style.display = "none";
-    seriesGroup.style.display = "block";
+
+    storeGroup.style.display =
+      "none";
+
+
+    seriesGroup.style.display =
+      "block";
 
   }
 
@@ -625,13 +913,23 @@ function changeType() {
 
 function showForm() {
 
+
   document
-    .getElementById("formSection")
-    .classList.add("show");
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .add("show");
+
 
   window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth"
+
+    top:
+      document.body.scrollHeight,
+
+    behavior:
+      "smooth"
+
   });
 
 }
@@ -643,9 +941,13 @@ function showForm() {
 
 function hideForm() {
 
+
   document
-    .getElementById("formSection")
-    .classList.remove("show");
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .remove("show");
 
 }
 
@@ -656,45 +958,100 @@ function hideForm() {
 
 async function saveResult() {
 
+
   const type =
-    document.getElementById("type").value;
+    document.getElementById(
+      "type"
+    ).value;
+
 
   const date =
-    document.getElementById("date").value;
+    document.getElementById(
+      "date"
+    ).value;
+
 
   const tournamentName =
     document
-      .getElementById("tournamentName")
+      .getElementById(
+        "tournamentName"
+      )
       .value
       .trim();
 
+
   const buyIn =
-    Number(document.getElementById("buyIn").value || 0);
+    Number(
+      document.getElementById(
+        "buyIn"
+      ).value || 0
+    );
+
 
   const reEntry =
-    Number(document.getElementById("reEntry").value || 0);
+    Number(
+      document.getElementById(
+        "reEntry"
+      ).value || 0
+    );
+
 
   const players =
-    Number(document.getElementById("players").value || 0);
+    Number(
+      document.getElementById(
+        "players"
+      ).value || 0
+    );
+
 
   const rank =
-    Number(document.getElementById("rank").value || 0);
+    Number(
+      document.getElementById(
+        "rank"
+      ).value || 0
+    );
+
 
   const itmRank =
-    Number(document.getElementById("itmRank").value || 0);
+    Number(
+      document.getElementById(
+        "itmRank"
+      ).value || 0
+    );
+
 
   const prize =
-    Number(document.getElementById("prize").value || 0);
+    Number(
+      document.getElementById(
+        "prize"
+      ).value || 0
+    );
+
 
   const memo =
-    document.getElementById("memo").value.trim();
+    document
+      .getElementById(
+        "memo"
+      )
+      .value
+      .trim();
+
 
   const storeId =
-    document.getElementById("storeId").value || null;
+    document.getElementById(
+      "storeId"
+    ).value || null;
+
 
   const seriesId =
-    document.getElementById("seriesId").value || null;
+    document.getElementById(
+      "seriesId"
+    ).value || null;
 
+
+  // ========================================
+  // 入力チェック
+  // ========================================
 
   if (!date) {
 
@@ -707,6 +1064,7 @@ async function saveResult() {
 
   }
 
+
   if (!tournamentName) {
 
     showMessage(
@@ -717,6 +1075,7 @@ async function saveResult() {
     return;
 
   }
+
 
   if (buyIn <= 0) {
 
@@ -729,6 +1088,7 @@ async function saveResult() {
 
   }
 
+
   if (players <= 0) {
 
     showMessage(
@@ -739,6 +1099,7 @@ async function saveResult() {
     return;
 
   }
+
 
   if (rank <= 0) {
 
@@ -754,7 +1115,8 @@ async function saveResult() {
 
   if (
     type === "店舗トーナメント"
-    && !storeId
+    &&
+    !storeId
   ) {
 
     showMessage(
@@ -769,7 +1131,8 @@ async function saveResult() {
 
   if (
     type === "大型大会"
-    && !seriesId
+    &&
+    !seriesId
   ) {
 
     showMessage(
@@ -782,49 +1145,81 @@ async function saveResult() {
   }
 
 
-  const saveButton =
-    document.querySelector(".save-button");
+  // ========================================
+  // 保存中
+  // ========================================
 
-  saveButton.disabled = true;
+  const saveButton =
+    document.querySelector(
+      ".save-button"
+    );
+
+
+  saveButton.disabled =
+    true;
+
 
   saveButton.textContent =
     "保存中...";
 
 
+  // ========================================
+  // Supabaseへ保存
+  // ========================================
+
   const { error } =
     await supabaseClient
+
       .from("poker_results")
+
       .insert({
 
-        date: date,
+        date:
+          date,
 
-        type: type,
+        type:
+          type,
 
-        series_id: seriesId,
+        series_id:
+          seriesId,
 
-        store_id: storeId,
+        store_id:
+          storeId,
 
         tournament_name:
           tournamentName,
 
-        buy_in: buyIn,
+        buy_in:
+          buyIn,
 
-        re_entry: reEntry,
+        re_entry:
+          reEntry,
 
-        players: players,
+        players:
+          players,
 
-        rank: rank,
+        rank:
+          rank,
 
-        itm_rank: itmRank,
+        itm_rank:
+          itmRank,
 
-        prize: prize,
+        prize:
+          prize,
 
-        memo: memo || null
+        memo:
+          memo || null
 
       });
 
 
-  saveButton.disabled = false;
+  // ========================================
+  // 保存完了
+  // ========================================
+
+  saveButton.disabled =
+    false;
+
 
   saveButton.textContent =
     "💾 戦績を保存";
@@ -832,13 +1227,16 @@ async function saveResult() {
 
   if (error) {
 
+
     console.error(error);
+
 
     showMessage(
       "保存に失敗しました：" +
       error.message,
       "error"
     );
+
 
     return;
 
@@ -856,13 +1254,21 @@ async function saveResult() {
 
   setTimeout(() => {
 
+
     hideForm();
 
+
     document
-      .getElementById("formSection")
+      .getElementById(
+        "formSection"
+      )
       .scrollIntoView({
-        behavior: "smooth"
+
+        behavior:
+          "smooth"
+
       });
+
 
   }, 1000);
 
@@ -875,13 +1281,22 @@ async function saveResult() {
 
 async function loadResults() {
 
+
   const { data, error } =
     await supabaseClient
+
       .from("poker_results")
+
       .select("*")
-      .order("date", {
-        ascending: false
-      });
+
+      .order(
+        "date",
+        {
+          ascending:
+            false
+        }
+      );
+
 
   if (error) {
 
@@ -892,94 +1307,175 @@ async function loadResults() {
   }
 
 
-  const results = data || [];
+  const results =
+    data || [];
+
 
   const totalGames =
     results.length;
 
 
-  let itmGames = 0;
-
-  let totalCost = 0;
-
-  let totalPrize = 0;
+  let itmGames =
+    0;
 
 
-  results.forEach(result => {
-
-    const buyIn =
-      Number(result.buy_in || 0);
-
-    const reEntry =
-      Number(result.re_entry || 0);
-
-    const prize =
-      Number(result.prize || 0);
-
-    const rank =
-      Number(result.rank || 0);
-
-    const itmRank =
-      Number(result.itm_rank || 0);
+  let totalCost =
+    0;
 
 
-    const cost =
-      buyIn * (1 + reEntry);
-
-    totalCost += cost;
-
-    totalPrize += prize;
+  let totalPrize =
+    0;
 
 
-    if (
-      itmRank > 0 &&
-      rank > 0 &&
-      rank <= itmRank
-    ) {
+  results.forEach(
+    result => {
 
-      itmGames++;
+
+      const buyIn =
+        Number(
+          result.buy_in || 0
+        );
+
+
+      const reEntry =
+        Number(
+          result.re_entry || 0
+        );
+
+
+      const prize =
+        Number(
+          result.prize || 0
+        );
+
+
+      const rank =
+        Number(
+          result.rank || 0
+        );
+
+
+      const itmRank =
+        Number(
+          result.itm_rank || 0
+        );
+
+
+      // ====================================
+      // 総投資額
+      // ====================================
+
+      const cost =
+        buyIn *
+        (1 + reEntry);
+
+
+      totalCost +=
+        cost;
+
+
+      totalPrize +=
+        prize;
+
+
+      // ====================================
+      // ITM判定
+      // ====================================
+
+      if (
+
+        itmRank > 0
+        &&
+        rank > 0
+        &&
+        rank <= itmRank
+
+      ) {
+
+        itmGames++;
+
+      }
+
 
     }
+  );
 
-  });
 
+  // ========================================
+  // ITM率
+  // ========================================
 
   const itmRate =
+
     totalGames > 0
-      ? (itmGames / totalGames) * 100
+
+      ? (
+          itmGames /
+          totalGames
+        ) * 100
+
       : 0;
 
+
+  // ========================================
+  // 利益
+  // ========================================
 
   const profit =
-    totalPrize - totalCost;
+    totalPrize -
+    totalCost;
 
+
+  // ========================================
+  // ROI
+  // ========================================
 
   const roi =
+
     totalCost > 0
-      ? (profit / totalCost) * 100
+
+      ? (
+          profit /
+          totalCost
+        ) * 100
+
       : 0;
 
 
+  // ========================================
+  // 画面更新
+  // ========================================
+
   document
-    .getElementById("totalGames")
+    .getElementById(
+      "totalGames"
+    )
     .textContent =
       totalGames;
 
 
   document
-    .getElementById("itmRate")
+    .getElementById(
+      "itmRate"
+    )
     .textContent =
-      itmRate.toFixed(1) + "%";
+      itmRate.toFixed(1) +
+      "%";
 
 
   document
-    .getElementById("roi")
+    .getElementById(
+      "roi"
+    )
     .textContent =
-      roi.toFixed(1) + "%";
+      roi.toFixed(1) +
+      "%";
 
 
   document
-    .getElementById("profit")
+    .getElementById(
+      "profit"
+    )
     .textContent =
       "¥" +
       profit.toLocaleString();
@@ -991,15 +1487,25 @@ async function loadResults() {
 // メッセージ
 // ============================================
 
-function showMessage(text, type) {
+function showMessage(
+  text,
+  type
+) {
+
 
   const message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
-  message.textContent = text;
+
+  message.textContent =
+    text;
+
 
   message.className =
-    "message " + type;
+    "message " +
+    type;
 
 }
 
@@ -1008,5 +1514,7 @@ function showMessage(text, type) {
 
 </script>
 
+
 </body>
+
 </html>
