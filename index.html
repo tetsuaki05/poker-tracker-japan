@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
 <title>POKER TRACKER JAPAN</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 
 <style>
 
@@ -129,6 +138,58 @@ button{
   color:#071019
 }
 
+
+/* =========================
+   写真登録
+========================= */
+
+.photo-choice{
+  display:none;
+  margin-bottom:16px;
+  background:#11192d;
+  border:1px solid #30405f;
+  border-radius:20px;
+  padding:20px
+}
+
+.photo-choice.show{
+  display:block
+}
+
+.photo-choice-title{
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:15px;
+  text-align:center
+}
+
+.photo-choice-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
+}
+
+.photo-choice-button{
+  border:1px solid #3a4a6b;
+  border-radius:16px;
+  padding:20px 12px;
+  background:#1a243d;
+  color:#fff;
+  cursor:pointer;
+  font-size:17px;
+  font-weight:800
+}
+
+.photo-choice-button:hover{
+  background:#243352
+}
+
+.photo-choice-icon{
+  font-size:36px;
+  display:block;
+  margin-bottom:8px
+}
+
 .photo-preview{
   display:none;
   margin-top:15px;
@@ -153,8 +214,14 @@ button{
 .photo-info{
   color:#a8b1c7;
   font-size:14px;
-  margin-top:8px
+  margin-top:10px;
+  line-height:1.6
 }
+
+
+/* =========================
+   フォーム
+========================= */
 
 .form-section{
   display:none;
@@ -547,6 +614,10 @@ textarea{
     grid-template-columns:1fr
   }
 
+  .photo-choice-buttons{
+    grid-template-columns:1fr
+  }
+
   .stat-value{
     font-size:37px
   }
@@ -574,11 +645,14 @@ textarea{
 }
 
 </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
+
 
 <header>
 
@@ -594,9 +668,13 @@ textarea{
 
   </div>
 
+
   <div class="header-right">
 
-    <span id="userName" class="user-name">
+    <span
+      id="userName"
+      class="user-name"
+    >
       未ログイン
     </span>
 
@@ -698,12 +776,14 @@ textarea{
     ✏️ 戦績登録
   </button>
 
+
   <button
     class="tab"
     onclick="showTab('history',this)"
   >
     📋 戦績一覧
   </button>
+
 
   <button
     class="tab"
@@ -712,6 +792,7 @@ textarea{
     🏆 ランキング
   </button>
 
+
   <button
     class="tab"
     onclick="showTab('analysis',this)"
@@ -719,12 +800,14 @@ textarea{
     📊 詳細分析
   </button>
 
+
   <button
     class="tab"
     onclick="showTab('profile',this)"
   >
     👤 プロフィール
   </button>
+
 
   <button
     class="tab"
@@ -741,10 +824,15 @@ textarea{
   class="tab-panel active"
 >
 
+
   <h2 class="section-title">
     戦績を記録
   </h2>
 
+
+  <!-- =========================
+       写真登録ボタン
+  ========================= -->
 
   <button
     class="main-button primary"
@@ -754,23 +842,83 @@ textarea{
   </button>
 
 
-  <button
-    class="main-button"
-    onclick="showForm()"
-  >
-    ✏️ 手入力で記録
-  </button>
+  <!-- =========================
+       写真選択
+  ========================= -->
 
+  <div
+    id="photoChoice"
+    class="photo-choice"
+  >
+
+    <div class="photo-choice-title">
+      大会写真を選択
+    </div>
+
+
+    <div class="photo-choice-buttons">
+
+
+      <button
+        type="button"
+        class="photo-choice-button"
+        onclick="openPhotoLibrary()"
+      >
+
+        <span class="photo-choice-icon">
+          🖼️
+        </span>
+
+        写真ボックスから選択
+
+      </button>
+
+
+      <button
+        type="button"
+        class="photo-choice-button"
+        onclick="openCamera()"
+      >
+
+        <span class="photo-choice-icon">
+          📸
+        </span>
+
+        カメラで撮影
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 写真アプリ -->
 
   <input
     type="file"
-    id="photoInput"
+    id="photoLibraryInput"
+    accept="image/*"
+    class="hidden"
+    onchange="handlePhotoUpload(event)"
+  >
+
+
+  <!-- カメラ -->
+
+  <input
+    type="file"
+    id="cameraInput"
     accept="image/*"
     capture="environment"
     class="hidden"
     onchange="handlePhotoUpload(event)"
   >
 
+
+  <!-- =========================
+       写真プレビュー
+  ========================= -->
 
   <div
     id="photoPreview"
@@ -783,6 +931,7 @@ textarea{
       alt="大会写真"
     >
 
+
     <div
       id="photoInfo"
       class="photo-info"
@@ -792,6 +941,22 @@ textarea{
 
   </div>
 
+
+  <!-- =========================
+       手入力
+  ========================= -->
+
+  <button
+    class="main-button"
+    onclick="showForm()"
+  >
+    ✏️ 手入力で記録
+  </button>
+
+
+  <!-- =========================
+       戦績フォーム
+  ========================= -->
 
   <div
     id="formSection"
@@ -875,13 +1040,14 @@ textarea{
 
       <input
         id="tournamentName"
-        placeholder="写真から自動入力されます"
+        placeholder="大会名"
       >
 
     </div>
 
 
     <div class="grid2">
+
 
       <div class="form-group">
 
@@ -907,7 +1073,7 @@ textarea{
           id="buyIn"
           type="number"
           min="0"
-          placeholder="写真から自動入力"
+          placeholder="Buy-in"
         >
 
       </div>
@@ -916,6 +1082,7 @@ textarea{
 
 
     <div class="grid2">
+
 
       <div class="form-group">
 
@@ -930,6 +1097,10 @@ textarea{
           value="0"
         >
 
+        <div class="muted">
+          ※リエントリーは手入力
+        </div>
+
       </div>
 
 
@@ -943,7 +1114,7 @@ textarea{
           id="players"
           type="number"
           min="1"
-          placeholder="写真から自動入力"
+          placeholder="参加人数"
         >
 
       </div>
@@ -952,6 +1123,7 @@ textarea{
 
 
     <div class="grid2">
+
 
       <div class="form-group">
 
@@ -963,7 +1135,7 @@ textarea{
           id="rank"
           type="number"
           min="1"
-          placeholder="自分の順位を入力"
+          placeholder="自分の順位"
         >
 
       </div>
@@ -1043,6 +1215,10 @@ textarea{
 </section>
 
 
+<!-- =========================
+     戦績一覧
+========================= -->
+
 <section
   id="history"
   class="tab-panel"
@@ -1051,6 +1227,7 @@ textarea{
   <h2 class="section-title">
     📋 戦績一覧
   </h2>
+
 
   <div
     id="historyList"
@@ -1066,6 +1243,10 @@ textarea{
 </section>
 
 
+<!-- =========================
+     ランキング
+========================= -->
+
 <section
   id="ranking"
   class="tab-panel"
@@ -1074,6 +1255,7 @@ textarea{
   <h2 class="section-title">
     🏆 プレイヤーランキング
   </h2>
+
 
   <div class="panel">
 
@@ -1086,6 +1268,7 @@ textarea{
         今月
       </button>
 
+
       <button
         class="tab"
         onclick="loadRanking('year',this)"
@@ -1094,6 +1277,7 @@ textarea{
       </button>
 
     </div>
+
 
     <div
       id="rankingList"
@@ -1111,6 +1295,10 @@ textarea{
 </section>
 
 
+<!-- =========================
+     分析
+========================= -->
+
 <section
   id="analysis"
   class="tab-panel"
@@ -1120,7 +1308,9 @@ textarea{
     📊 詳細分析
   </h2>
 
+
   <div class="analysis-grid">
+
 
     <div class="mini">
 
@@ -1224,6 +1414,7 @@ textarea{
     🏪 店舗別分析
   </h2>
 
+
   <div
     id="storeAnalysis"
     class="list"
@@ -1238,6 +1429,10 @@ textarea{
 </section>
 
 
+<!-- =========================
+     プロフィール
+========================= -->
+
 <section
   id="profile"
   class="tab-panel"
@@ -1247,9 +1442,11 @@ textarea{
     👤 プロフィール
   </h2>
 
+
   <div class="panel">
 
     <div class="profile-grid">
+
 
       <div class="form-group">
 
@@ -1301,6 +1498,7 @@ textarea{
     🏅 バッジ
   </h2>
 
+
   <div
     id="badges"
     class="badges"
@@ -1310,6 +1508,7 @@ textarea{
   <h2 class="section-title">
     🔥 連続記録
   </h2>
+
 
   <div class="panel">
 
@@ -1329,6 +1528,10 @@ textarea{
 </section>
 
 
+<!-- =========================
+     目標
+========================= -->
+
 <section
   id="goals"
   class="tab-panel"
@@ -1338,9 +1541,11 @@ textarea{
     🎯 目標設定
   </h2>
 
+
   <div class="panel">
 
     <div class="goal-grid">
+
 
       <div class="form-group">
 
@@ -1435,7 +1640,9 @@ textarea{
 </div>
 
 
-<!-- ログインモーダル -->
+<!-- =========================
+     ログイン
+========================= -->
 
 <div
   id="authModal"
@@ -1484,6 +1691,7 @@ textarea{
 
     <div class="modal-actions">
 
+
       <button
         class="save-button"
         onclick="submitAuth()"
@@ -1491,12 +1699,14 @@ textarea{
         ログイン
       </button>
 
+
       <button
         class="cancel-button"
         onclick="toggleAuthMode()"
       >
         新規登録に切り替え
       </button>
+
 
       <button
         class="cancel-button"
@@ -1518,7 +1728,9 @@ textarea{
 </div>
 
 
-<!-- 保存完了演出 -->
+<!-- =========================
+     保存完了
+========================= -->
 
 <div
   id="celebrate"
@@ -1550,11 +1762,18 @@ textarea{
 
 <script>
 
+
+/* =========================
+   Supabase
+========================= */
+
 const SUPABASE_URL =
   "https://whbmhkfvhyrdyfmtapzh.supabase.co";
 
+
 const SUPABASE_KEY =
   "sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
+
 
 const supabaseClient =
   window.supabase.createClient(
@@ -1580,12 +1799,11 @@ document.addEventListener(
   "DOMContentLoaded",
   async () => {
 
+
     document
       .getElementById("date")
       .value =
-        new Date()
-          .toISOString()
-          .split("T")[0];
+        getLocalDate();
 
 
     await loadStores();
@@ -1618,6 +1836,43 @@ document.addEventListener(
 
   }
 );
+
+
+/* =========================
+   日本時間の日付
+========================= */
+
+function getLocalDate(){
+
+  const now =
+    new Date();
+
+
+  const year =
+    now.getFullYear();
+
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const day =
+    String(
+      now.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return `${year}-${month}-${day}`;
+
+}
 
 
 /* =========================
@@ -1923,7 +2178,7 @@ function hideForm(){
 
 
 /* =========================
-   写真登録
+   写真登録開始
 ========================= */
 
 function showPhotoForm(){
@@ -1937,8 +2192,50 @@ function showPhotoForm(){
   }
 
 
+  const choice =
+    document.getElementById(
+      "photoChoice"
+    );
+
+
+  choice
+    .classList
+    .toggle("show");
+
+
+  choice.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+
+}
+
+
+/* =========================
+   写真ボックス
+========================= */
+
+function openPhotoLibrary(){
+
   document
-    .getElementById("photoInput")
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .click();
+
+}
+
+
+/* =========================
+   カメラ
+========================= */
+
+function openCamera(){
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
     .click();
 
 }
@@ -1961,7 +2258,9 @@ async function handlePhotoUpload(event){
   }
 
 
-  if(!file.type.startsWith("image/")){
+  if(
+    !file.type.startsWith("image/")
+  ){
 
     showBox(
       "message",
@@ -1978,16 +2277,20 @@ async function handlePhotoUpload(event){
     写真を選択した日を開催日にする
   */
 
-  const today =
-    new Date()
-      .toISOString()
-      .split("T")[0];
-
-
   document
     .getElementById("date")
     .value =
-      today;
+      getLocalDate();
+
+
+  /*
+    写真選択画面を閉じる
+  */
+
+  document
+    .getElementById("photoChoice")
+    .classList
+    .remove("show");
 
 
   /*
@@ -2018,7 +2321,7 @@ async function handlePhotoUpload(event){
   document
     .getElementById("photoInfo")
     .textContent =
-      "📷 写真を読み込んでいます...";
+      "📖 写真を解析しています...";
 
 
   /*
@@ -2040,6 +2343,7 @@ async function handlePhotoUpload(event){
 
   try{
 
+
     /*
       OCR
     */
@@ -2055,7 +2359,7 @@ async function handlePhotoUpload(event){
 
 
     /*
-      OCR結果を解析
+      OCR解析
     */
 
     const parsed =
@@ -2111,6 +2415,17 @@ async function handlePhotoUpload(event){
 
 
     /*
+      リエントリーは
+      絶対に自動入力しない
+    */
+
+    document
+      .getElementById("reEntry")
+      .value =
+        "0";
+
+
+    /*
       写真をSupabaseへ保存
     */
 
@@ -2133,7 +2448,7 @@ async function handlePhotoUpload(event){
     document
       .getElementById("photoInfo")
       .textContent =
-        "✅ 写真を保存しました。内容を確認して、順位などを入力してください。";
+        "✅ 写真を保存しました。大会名・Buy-in・参加人数を確認して、順位などを入力してください。";
 
 
     showBox(
@@ -2159,7 +2474,7 @@ async function handlePhotoUpload(event){
 
     showBox(
       "message",
-      "写真の読み取りに失敗しました。大会名・参加人数などを手入力してください。",
+      "写真の読み取りに失敗しました。大会名・参加人数・Buy-inなどを手入力してください。",
       "error"
     );
 
@@ -2186,7 +2501,8 @@ async function runOCR(file){
       file,
       "eng",
       {
-        logger: m => {
+
+        logger:m => {
 
           if(
             m.status ===
@@ -2195,7 +2511,7 @@ async function runOCR(file){
 
             console.log(
               `OCR進捗: ${Math.round(
-                m.progress * 100
+                (m.progress || 0) * 100
               )}%`
             );
 
@@ -2270,7 +2586,8 @@ function parseTournamentText(text){
     clean
       .split("\n")
       .map(
-        x => x.trim()
+        x =>
+          x.trim()
       )
       .filter(Boolean);
 
@@ -2284,7 +2601,8 @@ function parseTournamentText(text){
   const candidates =
     lines.filter(
       line =>
-        !/LEVEL|PLAYER|PLAYERS|AVERAGE|CHIPCOUNT|INTERVAL|GAME TIME|ENTRY|REENTRY|BIG-ANTE|REGISTRATION/i
+        line.length >= 3 &&
+        !/LEVEL|PLAYER|PLAYERS|AVERAGE|CHIPCOUNT|INTERVAL|GAME TIME|ENTRY|REENTRY|RE-ENTRY|BIG-ANTE|REGISTRATION/i
           .test(line)
     );
 
@@ -2306,8 +2624,6 @@ function parseTournamentText(text){
     =========================
     参加人数
     =========================
-
-    例：
 
     PLAYERS
     2/26
@@ -2452,7 +2768,7 @@ async function uploadTournamentPhoto(file){
 
 
   const filePath =
-    `${currentUser.id}/${Date.now()}.${extension}`;
+    `${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 
 
   const {
@@ -2856,7 +3172,7 @@ async function saveResult(){
 
   const b =
     document.querySelector(
-      ".save-button"
+      "#formSection .save-button"
     );
 
 
@@ -2865,10 +3181,6 @@ async function saveResult(){
   b.textContent =
     "保存中...";
 
-
-  /*
-    DB保存
-  */
 
   const payload = {
 
@@ -2891,10 +3203,6 @@ async function saveResult(){
     buy_in:
       buyIn,
 
-    /*
-      リエントリーは完全手入力
-    */
-
     re_entry:
       reEntry,
 
@@ -2908,10 +3216,6 @@ async function saveResult(){
     prize,
 
     memo,
-
-    /*
-      大会写真
-    */
 
     photo_url:
       currentTournamentPhotoUrl ||
@@ -2970,10 +3274,6 @@ async function saveResult(){
   );
 
 
-  /*
-    フォームリセット
-  */
-
   [
     "tournamentName",
     "buyIn",
@@ -3008,16 +3308,22 @@ async function saveResult(){
       "0";
 
 
-  /*
-    写真情報リセット
-  */
-
   currentTournamentPhotoUrl =
     null;
 
 
   document
-    .getElementById("photoInput")
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
     .value =
       "";
 
@@ -3270,6 +3576,7 @@ function renderHistory(results){
           return `
 
             <div class="result-row">
+
 
               ${
                 r.photo_url
