@@ -1,8 +1,2528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>POKER TRACKER JAPAN</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:#0b1020;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif
+}
+
+.container{
+  width:min(1100px,92%);
+  margin:0 auto;
+  padding:30px 0 80px
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:28px
+}
+
+.logo{
+  font-size:38px;
+  font-weight:800;
+  letter-spacing:-1px
+}
+
+.subtitle{
+  color:#a8b1c7;
+  font-size:18px;
+  margin-top:6px
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
+.user-name{
+  color:#a8b1c7
+}
+
+button{
+  font-family:inherit
+}
+
+.top-btn{
+  border:0;
+  border-radius:14px;
+  padding:13px 18px;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  background:#5ce6ad;
+  color:#071019
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-bottom:38px
+}
+
+.stat,
+.panel{
+  background:#171f36;
+  border:1px solid #30405f;
+  border-radius:22px;
+  padding:24px
+}
+
+.stat-label{
+  color:#a8b1c7;
+  font-size:17px;
+  margin-bottom:8px
+}
+
+.stat-value{
+  font-size:42px;
+  font-weight:800
+}
+
+.green{
+  color:#5ce6ad
+}
+
+.section-title{
+  font-size:27px;
+  margin:34px 0 18px
+}
+
+.buttons{
+  display:grid;
+  gap:14px
+}
+
+.main-button{
+  width:100%;
+  border:0;
+  border-radius:17px;
+  padding:20px;
+  font-size:20px;
+  font-weight:800;
+  cursor:pointer;
+  background:#1c2945;
+  color:#fff;
+  margin-bottom:12px
+}
+
+.main-button.primary{
+  background:#5ce6ad;
+  color:#071019
+}
+
+
 /* =========================
-   OCR 強化版
+   写真登録
 ========================= */
 
-async function runOCR(file){
+.photo-choice{
+  display:none;
+  margin-bottom:16px;
+  background:#11192d;
+  border:1px solid #30405f;
+  border-radius:20px;
+  padding:20px
+}
+
+.photo-choice.show{
+  display:block
+}
+
+.photo-choice-title{
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:15px;
+  text-align:center
+}
+
+.photo-choice-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
+}
+
+.photo-choice-button{
+  border:1px solid #3a4a6b;
+  border-radius:16px;
+  padding:20px 12px;
+  background:#1a243d;
+  color:#fff;
+  cursor:pointer;
+  font-size:17px;
+  font-weight:800
+}
+
+.photo-choice-button:hover{
+  background:#243352
+}
+
+.photo-choice-icon{
+  font-size:36px;
+  display:block;
+  margin-bottom:8px
+}
+
+.photo-preview{
+  display:none;
+  margin-top:15px;
+  padding:15px;
+  background:#11192d;
+  border:1px solid #30405f;
+  border-radius:15px
+}
+
+.photo-preview.show{
+  display:block
+}
+
+.photo-preview img{
+  width:100%;
+  max-height:350px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#0b1020
+}
+
+.photo-info{
+  color:#a8b1c7;
+  font-size:14px;
+  margin-top:10px;
+  line-height:1.6
+}
+
+
+/* =========================
+   フォーム
+========================= */
+
+.form-section{
+  display:none;
+  background:#11192d;
+  border:1px solid #30405f;
+  border-radius:22px;
+  padding:26px;
+  margin-top:20px
+}
+
+.form-section.show{
+  display:block
+}
+
+.form-title{
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:20px
+}
+
+.form-group{
+  margin-bottom:17px
+}
+
+label{
+  display:block;
+  color:#c5ccdc;
+  font-size:15px;
+  margin-bottom:7px
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  background:#1a243d;
+  color:#fff;
+  border:1px solid #3a4a6b;
+  border-radius:11px;
+  padding:14px;
+  font-size:16px
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px
+}
+
+.save-button,
+.cancel-button{
+  width:100%;
+  margin-top:8px;
+  padding:18px;
+  border-radius:14px;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer
+}
+
+.save-button{
+  border:0;
+  background:#5ce6ad;
+  color:#071019
+}
+
+.save-button:disabled{
+  opacity:.6;
+  cursor:not-allowed
+}
+
+.cancel-button{
+  border:1px solid #3a4a6b;
+  background:transparent;
+  color:#fff
+}
+
+.message{
+  margin-top:16px;
+  padding:14px;
+  border-radius:11px;
+  display:none
+}
+
+.message.success{
+  display:block;
+  background:#123b2d;
+  color:#5ce6ad
+}
+
+.message.error{
+  display:block;
+  background:#421c24;
+  color:#ff8f9e
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin:30px 0 18px
+}
+
+.tab{
+  white-space:nowrap;
+  border:1px solid #30405f;
+  background:#141d34;
+  color:#b9c2d5;
+  padding:11px 15px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:700
+}
+
+.tab.active{
+  background:#5ce6ad;
+  color:#071019;
+  border-color:#5ce6ad
+}
+
+.tab-panel{
+  display:none
+}
+
+.tab-panel.active{
+  display:block
+}
+
+.list{
+  display:grid;
+  gap:10px
+}
+
+.result-row,
+.rank-row{
+  display:grid;
+  grid-template-columns:1.2fr .8fr .7fr .7fr;
+  gap:12px;
+  align-items:center;
+  background:#11192d;
+  border:1px solid #293857;
+  border-radius:14px;
+  padding:14px
+}
+
+.result-main strong,
+.rank-name{
+  display:block;
+  font-size:16px
+}
+
+.muted{
+  color:#9da8bd;
+  font-size:13px
+}
+
+.positive{
+  color:#5ce6ad;
+  font-weight:800
+}
+
+.negative{
+  color:#ff8f9e;
+  font-weight:800
+}
+
+.history-photo{
+  grid-column:1/-1;
+  margin-bottom:5px
+}
+
+.history-photo img{
+  width:100%;
+  max-height:300px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#0b1020;
+  cursor:pointer
+}
+
+.photo-label{
+  display:inline-block;
+  margin-top:8px;
+  color:#9da8bd;
+  font-size:12px
+}
+
+.rank-row{
+  grid-template-columns:55px 1fr 100px 100px
+}
+
+.rank-no{
+  font-size:22px;
+  font-weight:900
+}
+
+.profile-grid,
+.goal-grid,
+.analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px
+}
+
+.mini{
+  background:#11192d;
+  border:1px solid #293857;
+  border-radius:15px;
+  padding:18px
+}
+
+.mini-title{
+  color:#9da8bd;
+  font-size:14px
+}
+
+.mini-value{
+  font-size:27px;
+  font-weight:800;
+  margin-top:5px
+}
+
+.badges{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px
+}
+
+.badge{
+  background:#11192d;
+  border:1px solid #293857;
+  border-radius:15px;
+  padding:16px;
+  opacity:.35
+}
+
+.badge.earned{
+  opacity:1;
+  border-color:#5ce6ad
+}
+
+.badge-icon{
+  font-size:30px
+}
+
+.badge-name{
+  font-weight:800;
+  margin-top:6px
+}
+
+.badge-desc{
+  color:#9da8bd;
+  font-size:12px;
+  margin-top:3px
+}
+
+.progress{
+  height:10px;
+  background:#202b45;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:10px
+}
+
+.progress>div{
+  height:100%;
+  background:#5ce6ad;
+  width:0
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:10
+}
+
+.modal.show{
+  display:flex
+}
+
+.modal-card{
+  width:min(460px,100%);
+  background:#11192d;
+  border:1px solid #3a4a6b;
+  border-radius:22px;
+  padding:25px
+}
+
+.modal-title{
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:18px
+}
+
+.modal-actions{
+  display:grid;
+  gap:10px
+}
+
+.celebrate{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(5,10,20,.72);
+  z-index:20
+}
+
+.celebrate.show{
+  display:flex
+}
+
+.celebrate-card{
+  background:#171f36;
+  border:1px solid #5ce6ad;
+  border-radius:25px;
+  padding:38px;
+  text-align:center;
+  animation:pop .45s ease
+}
+
+.celebrate-emoji{
+  font-size:70px
+}
+
+.celebrate-title{
+  font-size:30px;
+  font-weight:900
+}
+
+.celebrate-text{
+  color:#a8b1c7;
+  margin-top:8px
+}
+
+@keyframes pop{
+  from{
+    transform:scale(.7);
+    opacity:0
+  }
+
+  to{
+    transform:scale(1);
+    opacity:1
+  }
+}
+
+.hidden{
+  display:none!important
+}
+
+.loading{
+  text-align:center;
+  color:#a8b1c7;
+  padding:20px
+}
+
+@media(max-width:700px){
+
+  .container{
+    padding-top:20px
+  }
+
+  .logo{
+    font-size:28px
+  }
+
+  .subtitle{
+    font-size:14px
+  }
+
+  .stats{
+    grid-template-columns:1fr
+  }
+
+  .grid2,
+  .profile-grid,
+  .goal-grid,
+  .analysis-grid{
+    grid-template-columns:1fr
+  }
+
+  .photo-choice-buttons{
+    grid-template-columns:1fr
+  }
+
+  .stat-value{
+    font-size:37px
+  }
+
+  .result-row{
+    grid-template-columns:1fr 1fr
+  }
+
+  .rank-row{
+    grid-template-columns:42px 1fr 80px
+  }
+
+  .badges{
+    grid-template-columns:1fr 1fr
+  }
+
+  header{
+    align-items:flex-start
+  }
+
+  .user-name{
+    display:none
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+  <div>
+
+    <div class="logo">
+      ♠ POKER TRACKER JAPAN
+    </div>
+
+    <div class="subtitle">
+      日本のライブポーカー戦績管理
+    </div>
+
+  </div>
+
+  <div class="header-right">
+
+    <span
+      id="userName"
+      class="user-name"
+    >
+      未ログイン
+    </span>
+
+    <button
+      class="top-btn"
+      id="authButton"
+      onclick="openAuth()"
+    >
+      🔐 ログイン
+    </button>
+
+  </div>
+
+</header>
+
+
+<div
+  id="loginNotice"
+  class="message error"
+>
+  戦績を保存・閲覧するにはログインしてください。
+</div>
+
+
+<!-- =========================
+     STATS
+========================= -->
+
+<section class="stats">
+
+  <div class="stat">
+
+    <div class="stat-label">
+      大会数
+    </div>
+
+    <div
+      class="stat-value"
+      id="totalGames"
+    >
+      0
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      ITM率
+    </div>
+
+    <div
+      class="stat-value"
+      id="itmRate"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      ROI
+    </div>
+
+    <div
+      class="stat-value green"
+      id="roi"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      累計利益
+    </div>
+
+    <div
+      class="stat-value"
+      id="profit"
+    >
+      ¥0
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     TABS
+========================= -->
+
+<div class="tabs">
+
+  <button
+    class="tab active"
+    onclick="showTab('record',this)"
+  >
+    ✏️ 戦績登録
+  </button>
+
+  <button
+    class="tab"
+    onclick="showTab('history',this)"
+  >
+    📋 戦績一覧
+  </button>
+
+  <button
+    class="tab"
+    onclick="showTab('ranking',this)"
+  >
+    🏆 ランキング
+  </button>
+
+  <button
+    class="tab"
+    onclick="showTab('analysis',this)"
+  >
+    📊 詳細分析
+  </button>
+
+  <button
+    class="tab"
+    onclick="showTab('profile',this)"
+  >
+    👤 プロフィール
+  </button>
+
+  <button
+    class="tab"
+    onclick="showTab('goals',this)"
+  >
+    🎯 目標
+  </button>
+
+</div>
+
+
+<!-- =========================
+     戦績登録
+========================= -->
+
+<section
+  id="record"
+  class="tab-panel active"
+>
+
+<h2 class="section-title">
+  戦績を記録
+</h2>
+
+
+<!-- 写真登録 -->
+
+<button
+  class="main-button primary"
+  onclick="showPhotoForm()"
+>
+  📷 大会写真から登録
+</button>
+
+
+<!-- 写真選択 -->
+
+<div
+  id="photoChoice"
+  class="photo-choice"
+>
+
+  <div class="photo-choice-title">
+    大会写真を選択
+  </div>
+
+
+  <div class="photo-choice-buttons">
+
+    <button
+      type="button"
+      class="photo-choice-button"
+      onclick="openPhotoLibrary()"
+    >
+
+      <span class="photo-choice-icon">
+        🖼️
+      </span>
+
+      写真ボックスから選択
+
+    </button>
+
+
+    <button
+      type="button"
+      class="photo-choice-button"
+      onclick="openCamera()"
+    >
+
+      <span class="photo-choice-icon">
+        📸
+      </span>
+
+      カメラで撮影
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- 写真アプリ -->
+
+<input
+  type="file"
+  id="photoLibraryInput"
+  accept="image/*"
+  class="hidden"
+  onchange="handlePhotoUpload(event)"
+>
+
+
+<!-- カメラ -->
+
+<input
+  type="file"
+  id="cameraInput"
+  accept="image/*"
+  capture="environment"
+  class="hidden"
+  onchange="handlePhotoUpload(event)"
+>
+
+
+<!-- 写真プレビュー -->
+
+<div
+  id="photoPreview"
+  class="photo-preview"
+>
+
+  <img
+    id="previewImage"
+    src=""
+    alt="大会写真"
+  >
+
+  <div
+    id="photoInfo"
+    class="photo-info"
+  >
+    写真を読み込んでいます...
+  </div>
+
+</div>
+
+
+<!-- 手入力 -->
+
+<button
+  class="main-button"
+  onclick="showForm()"
+>
+  ✏️ 手入力で記録
+</button>
+
+
+<!-- =========================
+     戦績フォーム
+========================= -->
+
+<div
+  id="formSection"
+  class="form-section"
+>
+
+  <div class="form-title">
+    戦績を登録
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      大会区分
+    </label>
+
+    <select
+      id="type"
+      onchange="changeType()"
+    >
+
+      <option value="店舗トーナメント">
+        店舗トーナメント
+      </option>
+
+      <option value="大型大会">
+        大型大会
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div
+    class="form-group"
+    id="storeGroup"
+  >
+
+    <label>
+      店舗
+    </label>
+
+    <select id="storeId">
+
+      <option value="">
+        店舗を選択してください
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div
+    class="form-group hidden"
+    id="seriesGroup"
+  >
+
+    <label>
+      大会シリーズ
+    </label>
+
+    <select id="seriesId">
+
+      <option value="">
+        大会シリーズを選択してください
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      大会名
+    </label>
+
+    <input
+      id="tournamentName"
+      placeholder="大会名"
+    >
+
+  </div>
+
+
+  <div class="grid2">
+
+    <div class="form-group">
+
+      <label>
+        開催日
+      </label>
+
+      <input
+        id="date"
+        type="date"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Buy-in（円）
+      </label>
+
+      <input
+        id="buyIn"
+        type="number"
+        min="0"
+        placeholder="Buy-in"
+      >
+
+    </div>
+
+  </div>
+
+
+  <div class="grid2">
+
+    <div class="form-group">
+
+      <label>
+        リエントリー回数
+      </label>
+
+      <input
+        id="reEntry"
+        type="number"
+        min="0"
+        value="0"
+      >
+
+      <div class="muted">
+        ※リエントリーは手入力
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        参加人数
+      </label>
+
+      <input
+        id="players"
+        type="number"
+        min="1"
+        placeholder="参加人数"
+      >
+
+    </div>
+
+  </div>
+
+
+  <div class="grid2">
+
+    <div class="form-group">
+
+      <label>
+        順位
+      </label>
+
+      <input
+        id="rank"
+        type="number"
+        min="1"
+        placeholder="自分の順位"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        ITM順位（入賞ライン）
+      </label>
+
+      <input
+        id="itmRank"
+        type="number"
+        min="1"
+        placeholder="例：15"
+      >
+
+    </div>
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      賞金（円）
+    </label>
+
+    <input
+      id="prize"
+      type="number"
+      min="0"
+      value="0"
+    >
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      メモ
+    </label>
+
+    <textarea
+      id="memo"
+      placeholder="大会の感想・反省点など"
+    ></textarea>
+
+  </div>
+
+
+  <button
+    class="save-button"
+    onclick="saveResult()"
+  >
+    💾 戦績を保存
+  </button>
+
+
+  <button
+    class="cancel-button"
+    onclick="hideForm()"
+  >
+    キャンセル
+  </button>
+
+
+  <div
+    id="message"
+    class="message"
+  ></div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     戦績一覧
+========================= -->
+
+<section
+  id="history"
+  class="tab-panel"
+>
+
+<h2 class="section-title">
+  📋 戦績一覧
+</h2>
+
+<div
+  id="historyList"
+  class="list"
+>
+
+  <div class="loading">
+    ログインすると表示されます
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     ランキング
+========================= -->
+
+<section
+  id="ranking"
+  class="tab-panel"
+>
+
+<h2 class="section-title">
+  🏆 プレイヤーランキング
+</h2>
+
+<div class="panel">
+
+  <div class="tabs">
+
+    <button
+      class="tab active"
+      onclick="loadRanking('month',this)"
+    >
+      今月
+    </button>
+
+    <button
+      class="tab"
+      onclick="loadRanking('year',this)"
+    >
+      今年
+    </button>
+
+  </div>
+
+
+  <div
+    id="rankingList"
+    class="list"
+  >
+
+    <div class="loading">
+      ログインしてください
+    </div>
+
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     分析
+========================= -->
+
+<section
+  id="analysis"
+  class="tab-panel"
+>
+
+<h2 class="section-title">
+  📊 詳細分析
+</h2>
+
+
+<div class="analysis-grid">
+
+  <div class="mini">
+
+    <div class="mini-title">
+      平均順位
+    </div>
+
+    <div
+      class="mini-value"
+      id="avgRank"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      平均参加人数
+    </div>
+
+    <div
+      class="mini-value"
+      id="avgPlayers"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      大型大会ROI
+    </div>
+
+    <div
+      class="mini-value"
+      id="largeRoi"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      店舗トーナメントROI
+    </div>
+
+    <div
+      class="mini-value"
+      id="storeRoi"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      最高順位
+    </div>
+
+    <div
+      class="mini-value"
+      id="bestRank"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      最大利益
+    </div>
+
+    <div
+      class="mini-value"
+      id="bestProfit"
+    >
+      -
+    </div>
+
+  </div>
+
+</div>
+
+
+<h2 class="section-title">
+  🏪 店舗別分析
+</h2>
+
+
+<div
+  id="storeAnalysis"
+  class="list"
+>
+
+  <div class="loading">
+    ログインしてください
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     プロフィール
+========================= -->
+
+<section
+  id="profile"
+  class="tab-panel"
+>
+
+<h2 class="section-title">
+  👤 プロフィール
+</h2>
+
+
+<div class="panel">
+
+  <div class="profile-grid">
+
+    <div class="form-group">
+
+      <label>
+        表示名
+      </label>
+
+      <input
+        id="profileName"
+        placeholder="プレイヤー名"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        自己紹介
+      </label>
+
+      <input
+        id="profileBio"
+        placeholder="一言"
+      >
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="save-button"
+    onclick="saveProfile()"
+  >
+    プロフィールを保存
+  </button>
+
+
+  <div
+    id="profileMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<h2 class="section-title">
+  🏅 バッジ
+</h2>
+
+<div
+  id="badges"
+  class="badges"
+></div>
+
+
+<h2 class="section-title">
+  🔥 連続記録
+</h2>
+
+<div class="panel">
+
+  <div class="mini-title">
+    連続大会参加
+  </div>
+
+  <div
+    class="mini-value"
+    id="streak"
+  >
+    0大会
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     目標
+========================= -->
+
+<section
+  id="goals"
+  class="tab-panel"
+>
+
+<h2 class="section-title">
+  🎯 目標設定
+</h2>
+
+
+<div class="panel">
+
+  <div class="goal-grid">
+
+    <div class="form-group">
+
+      <label>
+        年間大会数目標
+      </label>
+
+      <input
+        id="goalGames"
+        type="number"
+        min="1"
+        placeholder="100"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        年間利益目標（円）
+      </label>
+
+      <input
+        id="goalProfit"
+        type="number"
+        min="0"
+        placeholder="100000"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        目標ROI（%）
+      </label>
+
+      <input
+        id="goalRoi"
+        type="number"
+        step="0.1"
+        placeholder="20"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        目標ITM率（%）
+      </label>
+
+      <input
+        id="goalItm"
+        type="number"
+        step="0.1"
+        placeholder="30"
+      >
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="save-button"
+    onclick="saveGoals()"
+  >
+    🎯 目標を保存
+  </button>
+
+
+  <div
+    id="goalMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<div
+  id="goalProgress"
+  class="panel"
+  style="margin-top:16px"
+></div>
+
+</section>
+
+</div>
+
+
+<!-- =========================
+     ログイン
+========================= -->
+
+<div
+  id="authModal"
+  class="modal"
+>
+
+<div class="modal-card">
+
+  <div
+    class="modal-title"
+    id="authTitle"
+  >
+    🔐 ログイン
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      メールアドレス
+    </label>
+
+    <input
+      id="authEmail"
+      type="email"
+      autocomplete="email"
+    >
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      パスワード
+    </label>
+
+    <input
+      id="authPassword"
+      type="password"
+      autocomplete="current-password"
+    >
+
+  </div>
+
+
+  <div class="modal-actions">
+
+    <button
+      class="save-button"
+      onclick="submitAuth()"
+    >
+      ログイン
+    </button>
+
+
+    <button
+      class="cancel-button"
+      onclick="toggleAuthMode()"
+      id="authModeButton"
+    >
+      新規登録に切り替え
+    </button>
+
+
+    <button
+      class="cancel-button"
+      onclick="closeAuth()"
+    >
+      閉じる
+    </button>
+
+  </div>
+
+
+  <div
+    id="authMessage"
+    class="message"
+  ></div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     保存完了
+========================= -->
+
+<div
+  id="celebrate"
+  class="celebrate"
+  onclick="closeCelebrate()"
+>
+
+<div class="celebrate-card">
+
+  <div class="celebrate-emoji">
+    🎉
+  </div>
+
+  <div class="celebrate-title">
+    おめでとう！
+  </div>
+
+  <div
+    class="celebrate-text"
+    id="celebrateText"
+  >
+    戦績を登録しました！
+  </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   Supabase
+========================= */
+
+const SUPABASE_URL =
+  "https://whbmhkfvhyrdyfmtapzh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+let currentUser = null;
+
+let authMode = "login";
+
+let allResults = [];
+
+let currentTournamentPhotoUrl = null;
+
+
+/* =========================
+   初期化
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    document
+      .getElementById("date")
+      .value = getLocalDate();
+
+
+    await loadStores();
+
+    await loadSeries();
+
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    await applySession(session);
+
+
+    supabaseClient
+      .auth
+      .onAuthStateChange(
+        async (
+          _event,
+          session
+        ) => {
+
+          await applySession(
+            session
+          );
+
+        }
+      );
+
+  }
+);
+
+
+/* =========================
+   日本時間の日付
+========================= */
+
+function getLocalDate(){
+
+  const now =
+    new Date();
+
+
+  const year =
+    now.getFullYear();
+
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const day =
+    String(
+      now.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================
+   セッション
+========================= */
+
+async function applySession(
+  session
+){
+
+  currentUser =
+    session?.user || null;
+
+
+  document
+    .getElementById("loginNotice")
+    .classList
+    .toggle(
+      "hidden",
+      !!currentUser
+    );
+
+
+  document
+    .getElementById("authButton")
+    .textContent =
+      currentUser
+        ? "🚪 ログアウト"
+        : "🔐 ログイン";
+
+
+  document
+    .getElementById("userName")
+    .textContent =
+      currentUser
+        ? currentUser.email ||
+          "ログイン中"
+        : "未ログイン";
+
+
+  if(currentUser){
+
+    await loadProfile();
+
+    await loadResults();
+
+    await loadGoals();
+
+    await loadRanking(
+      "month"
+    );
+
+  }else{
+
+    allResults = [];
+
+    updateStats([]);
+
+    renderHistory([]);
+
+    renderRanking([]);
+
+  }
+
+}
+
+
+/* =========================
+   ログイン
+========================= */
+
+function openAuth(){
+
+  if(currentUser){
+
+    supabaseClient
+      .auth
+      .signOut();
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("authModal")
+    .classList
+    .add("show");
+
+}
+
+
+function closeAuth(){
+
+  document
+    .getElementById("authModal")
+    .classList
+    .remove("show");
+
+}
+
+
+function toggleAuthMode(){
+
+  authMode =
+    authMode === "login"
+      ? "signup"
+      : "login";
+
+
+  document
+    .getElementById("authTitle")
+    .textContent =
+      authMode === "login"
+        ? "🔐 ログイン"
+        : "🆕 新規登録";
+
+
+  document
+    .querySelector(
+      "#authModal .save-button"
+    )
+    .textContent =
+      authMode === "login"
+        ? "ログイン"
+        : "新規登録";
+
+
+  document
+    .getElementById(
+      "authModeButton"
+    )
+    .textContent =
+      authMode === "login"
+        ? "新規登録に切り替え"
+        : "ログインに切り替え";
+
+}
+
+
+async function submitAuth(){
+
+  const email =
+    document
+      .getElementById(
+        "authEmail"
+      )
+      .value
+      .trim();
+
+
+  const password =
+    document
+      .getElementById(
+        "authPassword"
+      )
+      .value;
+
+
+  if(
+    !email ||
+    !password
+  ){
+
+    showBox(
+      "authMessage",
+      "メールアドレスとパスワードを入力してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const res =
+    authMode === "login"
+
+      ? await supabaseClient
+          .auth
+          .signInWithPassword({
+            email,
+            password
+          })
+
+      : await supabaseClient
+          .auth
+          .signUp({
+            email,
+            password
+          });
+
+
+  if(res.error){
+
+    console.error(
+      "認証エラー:",
+      res.error
+    );
+
+
+    showBox(
+      "authMessage",
+      getAuthErrorMessage(
+        res.error
+      ),
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    authMode === "signup" &&
+    !res.data.session
+  ){
+
+    showBox(
+      "authMessage",
+      "確認メールを送信しました。メールを確認してアカウントを有効にしてください。",
+      "success"
+    );
+
+    return;
+
+  }
+
+
+  closeAuth();
+
+}
+
+
+/* =========================
+   タブ
+========================= */
+
+function showTab(
+  id,
+  btn
+){
+
+  document
+    .querySelectorAll(
+      ".tab-panel"
+    )
+    .forEach(
+      x =>
+        x.classList.remove(
+          "active"
+        )
+    );
+
+
+  document
+    .getElementById(id)
+    .classList
+    .add("active");
+
+
+  if(btn){
+
+    btn.parentElement
+      .querySelectorAll(
+        ".tab"
+      )
+      .forEach(
+        x =>
+          x.classList.remove(
+            "active"
+          )
+      );
+
+
+    btn.classList.add(
+      "active"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   手入力フォーム
+========================= */
+
+function showForm(){
+
+  if(!currentUser){
+
+    openAuth();
+
+    return;
+
+  }
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+}
+
+
+function hideForm(){
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .remove("show");
+
+}
+
+
+/* =========================
+   写真登録開始
+========================= */
+
+function showPhotoForm(){
+
+  if(!currentUser){
+
+    openAuth();
+
+    return;
+
+  }
+
+
+  const choice =
+    document.getElementById(
+      "photoChoice"
+    );
+
+
+  choice
+    .classList
+    .toggle("show");
+
+
+  choice.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+
+}
+
+
+/* =========================
+   写真ボックス
+========================= */
+
+function openPhotoLibrary(){
+
+  document
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .click();
+
+}
+
+
+/* =========================
+   カメラ
+========================= */
+
+function openCamera(){
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
+    .click();
+
+}
+
+
+/* =========================
+   写真選択
+========================= */
+
+async function handlePhotoUpload(
+  event
+){
+
+  const file =
+    event.target.files?.[0];
+
+
+  if(!file){
+
+    return;
+
+  }
+
+
+  if(
+    !file.type.startsWith(
+      "image/"
+    )
+  ){
+
+    showBox(
+      "message",
+      "画像ファイルを選択してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    写真を選択した日を開催日にする
+  */
+
+  document
+    .getElementById("date")
+    .value =
+      getLocalDate();
+
+
+  /*
+    写真選択画面を閉じる
+  */
+
+  document
+    .getElementById(
+      "photoChoice"
+    )
+    .classList
+    .remove("show");
+
+
+  /*
+    写真プレビュー
+  */
+
+  const preview =
+    document.getElementById(
+      "previewImage"
+    );
+
+
+  const previewBox =
+    document.getElementById(
+      "photoPreview"
+    );
+
+
+  preview.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  previewBox
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "photoInfo"
+    )
+    .textContent =
+      "📖 写真を解析しています...";
+
+
+  /*
+    入力フォーム表示
+  */
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+
+  try{
+
+    /*
+      OCR
+    */
+
+    const text =
+      await runOCR(
+        file
+      );
+
+
+    console.log(
+      "OCR結果:",
+      text
+    );
+
+
+    /*
+      OCR解析
+    */
+
+    const parsed =
+      parseTournamentText(
+        text
+      );
+
+
+    /*
+      大会名
+    */
+
+    if(
+      parsed.tournamentName
+    ){
+
+      document
+        .getElementById(
+          "tournamentName"
+        )
+        .value =
+          parsed.tournamentName;
+
+    }
+
+
+    /*
+      参加人数
+    */
+
+    if(
+      parsed.players
+    ){
+
+      document
+        .getElementById(
+          "players"
+        )
+        .value =
+          parsed.players;
+
+    }
+
+
+    /*
+      Buy-in
+    */
+
+    if(
+      parsed.buyIn
+    ){
+
+      document
+        .getElementById(
+          "buyIn"
+        )
+        .value =
+          parsed.buyIn;
+
+    }
+
+
+    /*
+      リエントリーは
+      絶対に自動入力しない
+    */
+
+    document
+      .getElementById(
+        "reEntry"
+      )
+      .value =
+        "0";
+
+
+    /*
+      写真をSupabaseへ保存
+    */
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        "📤 大会写真を保存しています...";
+
+
+    const photoUrl =
+      await uploadTournamentPhoto(
+        file
+      );
+
+
+    currentTournamentPhotoUrl =
+      photoUrl;
+
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        "✅ 写真を保存しました。大会名・Buy-in・参加人数を確認して、順位などを入力してください。";
+
+
+    showBox(
+      "message",
+      "📷 写真から情報を読み取りました。必要なら修正してください。",
+      "success"
+    );
+
+  }catch(error){
+
+    console.error(
+      "写真処理エラー:",
+      error
+    );
+
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        "⚠️ 写真の自動読み取りに失敗しました。手入力してください。";
+
+
+    showBox(
+      "message",
+      "写真の読み取りに失敗しました。大会名・参加人数・Buy-inなどを手入力してください。",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   OCR 強化版
+========================================================= */
+
+async function runOCR(
+  file
+){
 
   if(!window.Tesseract){
 
@@ -10,15 +2530,18 @@ async function runOCR(file){
 
   }
 
+
   /*
-    画像をOCR用に加工
+    OCR用に画像を加工
     ・拡大
     ・コントラスト調整
     ・明るさ調整
   */
 
   const processedFile =
-    await preprocessImage(file);
+    await preprocessImage(
+      file
+    );
 
 
   /*
@@ -31,6 +2554,7 @@ async function runOCR(file){
       processedFile,
       "eng",
       {
+
         logger:m => {
 
           if(
@@ -43,10 +2567,19 @@ async function runOCR(file){
                 (m.progress || 0) * 100
               );
 
-            document
-              .getElementById("photoInfo")
-              .textContent =
+
+            const info =
+              document.getElementById(
+                "photoInfo"
+              );
+
+
+            if(info){
+
+              info.textContent =
                 `📖 写真を読み取り中... ${progress}%`;
+
+            }
 
           }
 
@@ -70,23 +2603,27 @@ async function runOCR(file){
       processedFile,
       "eng",
       {
+
         config:{
           tessedit_pageseg_mode:"11"
         }
+
       }
     );
 
 
   /*
-    2つのOCR結果を合体
+    OCR結果
   */
 
   const text1 =
-    result1?.data?.text || "";
+    result1?.data?.text ||
+    "";
 
 
   const text2 =
-    result2?.data?.text || "";
+    result2?.data?.text ||
+    "";
 
 
   console.log(
@@ -114,10 +2651,15 @@ async function runOCR(file){
    OCR用画像加工
 ========================= */
 
-function preprocessImage(file){
+function preprocessImage(
+  file
+){
 
   return new Promise(
-    (resolve,reject) => {
+    (
+      resolve,
+      reject
+    ) => {
 
       const img =
         new Image();
@@ -250,7 +2792,9 @@ function preprocessImage(file){
         };
 
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(
+        file
+      );
 
     }
   );
@@ -265,11 +2809,10 @@ function preprocessImage(file){
 function loadTesseract(){
 
   return new Promise(
-    (resolve,reject) => {
-
-      /*
-        すでに読み込まれている場合
-      */
+    (
+      resolve,
+      reject
+    ) => {
 
       if(window.Tesseract){
 
@@ -308,7 +2851,9 @@ function loadTesseract(){
 
       document
         .head
-        .appendChild(script);
+        .appendChild(
+          script
+        );
 
     }
   );
@@ -320,7 +2865,9 @@ function loadTesseract(){
    OCR解析
 ========================= */
 
-function parseTournamentText(text){
+function parseTournamentText(
+  text
+){
 
   const result = {
 
@@ -333,9 +2880,18 @@ function parseTournamentText(text){
 
   const clean =
     String(text || "")
-      .replace(/\r/g," ")
-      .replace(/[|]/g," ")
-      .replace(/\s+/g," ")
+      .replace(
+        /\r/g,
+        " "
+      )
+      .replace(
+        /[|]/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
       .trim();
 
 
@@ -350,13 +2906,10 @@ function parseTournamentText(text){
     参加人数
     =========================
 
-    例：
-
     PLAYERS 2/26
 
     → 26
   */
-
 
   let playerMatch =
     clean.match(
@@ -365,7 +2918,7 @@ function parseTournamentText(text){
 
 
   /*
-    OCRで PLAYERS が認識できなかった場合
+    PLAYERSが認識できなかった場合
 
     2/26
 
@@ -395,15 +2948,12 @@ function parseTournamentText(text){
     Buy-in
     =========================
 
-    例：
-
     ENTRY 3.5K
 
     ENTRY ¥3,500
 
     BUY-IN 3.5K
   */
-
 
   let buyInMatch =
     clean.match(
@@ -422,7 +2972,7 @@ function parseTournamentText(text){
 
 
   /*
-    「3.5K」だけを認識した場合
+    3.5Kだけを認識した場合
   */
 
   if(!result.buyIn){
@@ -434,10 +2984,6 @@ function parseTournamentText(text){
 
 
     if(kMatches){
-
-      /*
-        最初に見つかったK表記
-      */
 
       result.buyIn =
         normalizeMoney(
@@ -455,19 +3001,20 @@ function parseTournamentText(text){
     =========================
   */
 
-
-  /*
-    OCR結果を行単位でも確認
-  */
-
   const lines =
     String(text || "")
-      .replace(/\r/g,"")
+      .replace(
+        /\r/g,
+        ""
+      )
       .split("\n")
       .map(
         line =>
           line
-            .replace(/\s+/g," ")
+            .replace(
+              /\s+/g,
+              " "
+            )
             .trim()
       )
       .filter(Boolean);
@@ -554,7 +3101,9 @@ function parseTournamentText(text){
    大会名クリーニング
 ========================= */
 
-function cleanTournamentName(name){
+function cleanTournamentName(
+  name
+){
 
   return String(
     name || ""
@@ -580,7 +3129,9 @@ function cleanTournamentName(name){
    金額変換
 ========================= */
 
-function normalizeMoney(value){
+function normalizeMoney(
+  value
+){
 
   if(!value){
 
@@ -591,10 +3142,22 @@ function normalizeMoney(value){
 
   const text =
     String(value)
-      .replace(/,/g,"")
-      .replace(/円/g,"")
-      .replace(/¥/g,"")
-      .replace(/￥/g,"")
+      .replace(
+        /,/g,
+        ""
+      )
+      .replace(
+        /円/g,
+        ""
+      )
+      .replace(
+        /¥/g,
+        ""
+      )
+      .replace(
+        /￥/g,
+        ""
+      )
       .trim()
       .toUpperCase();
 
@@ -619,7 +3182,9 @@ function normalizeMoney(value){
 
 
     if(
-      !Number.isNaN(number)
+      !Number.isNaN(
+        number
+      )
     ){
 
       return Math.round(
@@ -631,16 +3196,2541 @@ function normalizeMoney(value){
   }
 
 
-  /*
-    普通の数字
-  */
-
   const number =
     Number(text);
 
 
-  return Number.isNaN(number)
+  return Number.isNaN(
+    number
+  )
     ? 0
     : number;
 
 }
+
+
+/* =========================
+   写真アップロード
+========================= */
+
+async function uploadTournamentPhoto(
+  file
+){
+
+  if(!currentUser){
+
+    throw new Error(
+      "ログインしてください"
+    );
+
+  }
+
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase() ||
+      "jpg";
+
+
+  const filePath =
+    `${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "tournament-photos"
+      )
+      .upload(
+        filePath,
+        file,
+        {
+          cacheControl:"3600",
+          upsert:false,
+          contentType:file.type
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "写真アップロードエラー:",
+      error
+    );
+
+    throw error;
+
+  }
+
+
+  const {
+    data:publicData
+  } =
+    supabaseClient
+      .storage
+      .from(
+        "tournament-photos"
+      )
+      .getPublicUrl(
+        data.path
+      );
+
+
+  return publicData.publicUrl;
+
+}
+
+
+/* =========================
+   大会区分
+========================= */
+
+function changeType(){
+
+  const large =
+    document
+      .getElementById("type")
+      .value ===
+      "大型大会";
+
+
+  document
+    .getElementById(
+      "storeGroup"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      large
+    );
+
+
+  document
+    .getElementById(
+      "seriesGroup"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      !large
+    );
+
+}
+
+
+/* =========================
+   店舗
+========================= */
+
+async function loadStores(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_stores"
+      )
+      .select(
+        "id,name,location"
+      );
+
+
+  if(error){
+
+    console.error(
+      "店舗取得エラー:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const s =
+    document.getElementById(
+      "storeId"
+    );
+
+
+  s.innerHTML =
+    '<option value="">店舗を選択してください</option>';
+
+
+  (data || [])
+    .sort(
+      (a,b) =>
+        a.name.localeCompare(
+          b.name,
+          "ja"
+        )
+    )
+    .forEach(
+      x => {
+
+        const o =
+          document.createElement(
+            "option"
+          );
+
+
+        o.value =
+          x.id;
+
+
+        o.textContent =
+          x.location
+            ? `${x.name}（${x.location}）`
+            : x.name;
+
+
+        s.appendChild(o);
+
+      }
+    );
+
+}
+
+
+/* =========================
+   大会シリーズ
+========================= */
+
+async function loadSeries(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "tournament_series"
+      )
+      .select(
+        "id,name"
+      );
+
+
+  if(error){
+
+    console.error(
+      "大会シリーズ取得エラー:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const s =
+    document.getElementById(
+      "seriesId"
+    );
+
+
+  s.innerHTML =
+    '<option value="">大会シリーズを選択してください</option>';
+
+
+  (data || [])
+    .sort(
+      (a,b) =>
+        a.name.localeCompare(
+          b.name,
+          "ja"
+        )
+    )
+    .forEach(
+      x => {
+
+        const o =
+          document.createElement(
+            "option"
+          );
+
+
+        o.value =
+          x.id;
+
+
+        o.textContent =
+          x.name;
+
+
+        s.appendChild(o);
+
+      }
+    );
+
+}
+
+
+/* =========================
+   戦績保存
+========================= */
+
+async function saveResult(){
+
+  if(!currentUser){
+
+    openAuth();
+
+    return;
+
+  }
+
+
+  const type =
+    document
+      .getElementById(
+        "type"
+      )
+      .value;
+
+
+  const date =
+    document
+      .getElementById(
+        "date"
+      )
+      .value;
+
+
+  const name =
+    document
+      .getElementById(
+        "tournamentName"
+      )
+      .value
+      .trim();
+
+
+  const buyIn =
+    Number(
+      document
+        .getElementById(
+          "buyIn"
+        )
+        .value ||
+        0
+    );
+
+
+  const reEntry =
+    Number(
+      document
+        .getElementById(
+          "reEntry"
+        )
+        .value ||
+        0
+    );
+
+
+  const players =
+    Number(
+      document
+        .getElementById(
+          "players"
+        )
+        .value ||
+        0
+    );
+
+
+  const rank =
+    Number(
+      document
+        .getElementById(
+          "rank"
+        )
+        .value ||
+        0
+    );
+
+
+  const itmRank =
+    Number(
+      document
+        .getElementById(
+          "itmRank"
+        )
+        .value ||
+        0
+    );
+
+
+  const prize =
+    Number(
+      document
+        .getElementById(
+          "prize"
+        )
+        .value ||
+        0
+    );
+
+
+  const storeId =
+    document
+      .getElementById(
+        "storeId"
+      )
+      .value ||
+      null;
+
+
+  const seriesId =
+    document
+      .getElementById(
+        "seriesId"
+      )
+      .value ||
+      null;
+
+
+  const memo =
+    document
+      .getElementById(
+        "memo"
+      )
+      .value
+      .trim() ||
+      null;
+
+
+  /*
+    必須項目
+  */
+
+  if(
+    !date ||
+    !name ||
+    buyIn <= 0 ||
+    players <= 0 ||
+    rank <= 0
+  ){
+
+    showBox(
+      "message",
+      "開催日・大会名・Buy-in・参加人数・順位を入力してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    店舗大会
+  */
+
+  if(
+    type ===
+    "店舗トーナメント" &&
+    !storeId
+  ){
+
+    showBox(
+      "message",
+      "店舗を選択してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    大型大会
+  */
+
+  if(
+    type ===
+    "大型大会" &&
+    !seriesId
+  ){
+
+    showBox(
+      "message",
+      "大会シリーズを選択してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const b =
+    document.querySelector(
+      "#formSection .save-button"
+    );
+
+
+  b.disabled =
+    true;
+
+
+  b.textContent =
+    "保存中...";
+
+
+  const payload = {
+
+    user_id:
+      currentUser.id,
+
+    date,
+
+    type,
+
+    series_id:
+      seriesId,
+
+    store_id:
+      storeId,
+
+    tournament_name:
+      name,
+
+    buy_in:
+      buyIn,
+
+    re_entry:
+      reEntry,
+
+    players,
+
+    rank,
+
+    itm_rank:
+      itmRank,
+
+    prize,
+
+    memo,
+
+    photo_url:
+      currentTournamentPhotoUrl ||
+      null
+
+  };
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .insert(
+        payload
+      );
+
+
+  b.disabled =
+    false;
+
+
+  b.textContent =
+    "💾 戦績を保存";
+
+
+  if(error){
+
+    console.error(
+      "戦績保存エラー:",
+      error
+    );
+
+
+    showBox(
+      "message",
+      getDatabaseErrorMessage(
+        error,
+        "戦績の保存"
+      ),
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showBox(
+    "message",
+    "🎉 戦績を保存しました！",
+    "success"
+  );
+
+
+  showCelebrate(
+    `「${name}」の戦績を記録しました！`
+  );
+
+
+  [
+    "tournamentName",
+    "buyIn",
+    "players",
+    "rank",
+    "itmRank",
+    "prize",
+    "memo"
+  ]
+    .forEach(
+      id => {
+
+        const el =
+          document.getElementById(
+            id
+          );
+
+
+        if(el){
+
+          el.value =
+            "";
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "reEntry"
+    )
+    .value =
+      "0";
+
+
+  currentTournamentPhotoUrl =
+    null;
+
+
+  document
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "photoPreview"
+    )
+    .classList
+    .remove(
+      "show"
+    );
+
+
+  await loadResults();
+
+  await loadRanking(
+    "month"
+  );
+
+}
+
+
+/* =========================
+   戦績取得
+========================= */
+
+async function loadResults(){
+
+  if(!currentUser){
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "date",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "戦績取得エラー:",
+      error
+    );
+
+
+    showBox(
+      "message",
+      getDatabaseErrorMessage(
+        error,
+        "戦績の取得"
+      ),
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  allResults =
+    data || [];
+
+
+  updateStats(
+    allResults
+  );
+
+
+  renderHistory(
+    allResults
+  );
+
+
+  updateAnalysis(
+    allResults
+  );
+
+
+  updateBadges(
+    allResults
+  );
+
+
+  updateStreak(
+    allResults
+  );
+
+}
+
+
+/* =========================
+   集計
+========================= */
+
+function costOf(r){
+
+  return Number(
+    r.buy_in || 0
+  ) *
+  (
+    1 +
+    Number(
+      r.re_entry || 0
+    )
+  );
+
+}
+
+
+function profitOf(r){
+
+  return Number(
+    r.prize || 0
+  ) -
+  costOf(r);
+
+}
+
+
+function updateStats(
+  results
+){
+
+  let itm =
+    0;
+
+
+  let cost =
+    0;
+
+
+  let prize =
+    0;
+
+
+  results.forEach(
+    r => {
+
+      cost +=
+        costOf(r);
+
+
+      prize +=
+        Number(
+          r.prize || 0
+        );
+
+
+      if(
+        Number(
+          r.itm_rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) <=
+        Number(
+          r.itm_rank
+        )
+      ){
+
+        itm++;
+
+      }
+
+    }
+  );
+
+
+  const profit =
+    prize -
+    cost;
+
+
+  const roi =
+    cost
+      ? profit /
+        cost *
+        100
+      : 0;
+
+
+  document
+    .getElementById(
+      "totalGames"
+    )
+    .textContent =
+      results.length;
+
+
+  document
+    .getElementById(
+      "itmRate"
+    )
+    .textContent =
+      (
+        results.length
+          ? itm /
+            results.length *
+            100
+          : 0
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "roi"
+    )
+    .textContent =
+      roi.toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "profit"
+    )
+    .textContent =
+      "¥" +
+      profit.toLocaleString();
+
+}
+
+
+/* =========================
+   戦績一覧
+========================= */
+
+function renderHistory(
+  results
+){
+
+  const el =
+    document.getElementById(
+      "historyList"
+    );
+
+
+  if(!results.length){
+
+    el.innerHTML =
+      '<div class="loading">まだ戦績がありません。</div>';
+
+    return;
+
+  }
+
+
+  el.innerHTML =
+    results
+      .map(
+        r => {
+
+          const p =
+            profitOf(r);
+
+
+          const itm =
+            Number(
+              r.itm_rank
+            ) > 0 &&
+            Number(
+              r.rank
+            ) <=
+            Number(
+              r.itm_rank
+            );
+
+
+          return `
+
+            <div class="result-row">
+
+              ${
+                r.photo_url
+                  ? `
+
+                    <div class="history-photo">
+
+                      <img
+                        src="${esc(r.photo_url)}"
+                        alt="大会写真"
+                        onclick="window.open('${esc(r.photo_url)}','_blank')"
+                      >
+
+                      <span class="photo-label">
+                        📷 大会写真
+                      </span>
+
+                    </div>
+
+                  `
+                  : ""
+              }
+
+
+              <div class="result-main">
+
+                <strong>
+                  ${esc(
+                    r.tournament_name ||
+                    "-"
+                  )}
+                </strong>
+
+                <span class="muted">
+                  ${r.date || ""}
+                  ・
+                  ${r.type || ""}
+                </span>
+
+              </div>
+
+
+              <div>
+
+                ${r.rank || "-"}位
+                /
+                ${r.players || "-"}人
+
+              </div>
+
+
+              <div>
+
+                ${
+                  itm
+                    ? "🎯 ITM"
+                    : "-"
+                }
+
+              </div>
+
+
+              <div
+                class="${
+                  p >= 0
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  p >= 0
+                    ? "+"
+                    : ""
+                }
+
+                ¥${p.toLocaleString()}
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================
+   ランキング
+========================= */
+
+async function loadRanking(
+  period = "month",
+  btn = null
+){
+
+  if(btn){
+
+    btn.parentElement
+      .querySelectorAll(
+        ".tab"
+      )
+      .forEach(
+        x =>
+          x.classList.remove(
+            "active"
+          )
+      );
+
+
+    btn.classList.add(
+      "active"
+    );
+
+  }
+
+
+  if(!currentUser){
+
+    document
+      .getElementById(
+        "rankingList"
+      )
+      .innerHTML =
+        '<div class="loading">ログインするとランキングを確認できます。</div>';
+
+    return;
+
+  }
+
+
+  const now =
+    new Date();
+
+
+  const start =
+    period === "month"
+
+      ? new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1
+        )
+
+      : new Date(
+          now.getFullYear(),
+          0,
+          1
+        );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .select(
+        "user_id,prize,buy_in,re_entry,rank,profiles(display_name)"
+      )
+      .gte(
+        "date",
+        start
+          .toISOString()
+          .slice(
+            0,
+            10
+          )
+      );
+
+
+  if(error){
+
+    console.error(
+      "ランキング取得エラー:",
+      error
+    );
+
+
+    document
+      .getElementById(
+        "rankingList"
+      )
+      .innerHTML =
+        '<div class="message error" style="display:block">ランキングを取得できませんでした。</div>';
+
+
+    return;
+
+  }
+
+
+  const map = {};
+
+
+  (data || [])
+    .forEach(
+      r => {
+
+        const id =
+          r.user_id;
+
+
+        if(!id){
+
+          return;
+
+        }
+
+
+        if(!map[id]){
+
+          map[id] = {
+
+            id,
+
+            name:
+              r.profiles?.display_name ||
+              "プレイヤー",
+
+            games:
+              0,
+
+            profit:
+              0
+
+          };
+
+        }
+
+
+        map[id].games++;
+
+
+        map[id].profit +=
+          Number(
+            r.prize || 0
+          ) -
+          Number(
+            r.buy_in || 0
+          ) *
+          (
+            1 +
+            Number(
+              r.re_entry || 0
+            )
+          );
+
+      }
+    );
+
+
+  renderRanking(
+    Object
+      .values(map)
+      .sort(
+        (a,b) =>
+          b.profit -
+          a.profit
+      )
+  );
+
+}
+
+
+function renderRanking(
+  rows
+){
+
+  const el =
+    document.getElementById(
+      "rankingList"
+    );
+
+
+  if(!rows.length){
+
+    el.innerHTML =
+      '<div class="loading">まだランキングデータがありません。</div>';
+
+    return;
+
+  }
+
+
+  el.innerHTML =
+    rows
+      .slice(
+        0,
+        50
+      )
+      .map(
+        (r,i) => `
+
+          <div class="rank-row">
+
+            <div class="rank-no">
+              ${i + 1}
+            </div>
+
+
+            <div>
+
+              <span class="rank-name">
+                ${esc(r.name)}
+              </span>
+
+              <span class="muted">
+                ${r.games}大会
+              </span>
+
+            </div>
+
+
+            <div
+              class="${
+                r.profit >= 0
+                  ? "positive"
+                  : "negative"
+              }"
+            >
+
+              ${
+                r.profit >= 0
+                  ? "+"
+                  : ""
+              }
+
+              ¥${r.profit.toLocaleString()}
+
+            </div>
+
+
+            <div>
+              利益順
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* =========================
+   詳細分析
+========================= */
+
+function updateAnalysis(
+  results
+){
+
+  const n =
+    results.length;
+
+
+  const avgRank =
+    n
+      ? results.reduce(
+          (s,r) =>
+            s +
+            Number(
+              r.rank || 0
+            ),
+          0
+        ) /
+        n
+      : 0;
+
+
+  const avgPlayers =
+    n
+      ? results.reduce(
+          (s,r) =>
+            s +
+            Number(
+              r.players || 0
+            ),
+          0
+        ) /
+        n
+      : 0;
+
+
+  const roiFor =
+    type => {
+
+      const a =
+        results.filter(
+          r =>
+            r.type ===
+            type
+        );
+
+
+      const c =
+        a.reduce(
+          (s,r) =>
+            s +
+            costOf(r),
+          0
+        );
+
+
+      const p =
+        a.reduce(
+          (s,r) =>
+            s +
+            profitOf(r),
+          0
+        );
+
+
+      return c
+        ? p /
+          c *
+          100
+        : 0;
+
+    };
+
+
+  document
+    .getElementById(
+      "avgRank"
+    )
+    .textContent =
+      n
+        ? avgRank.toFixed(
+            1
+          ) +
+          "位"
+        : "-";
+
+
+  document
+    .getElementById(
+      "avgPlayers"
+    )
+    .textContent =
+      n
+        ? avgPlayers.toFixed(
+            0
+          ) +
+          "人"
+        : "-";
+
+
+  document
+    .getElementById(
+      "largeRoi"
+    )
+    .textContent =
+      roiFor(
+        "大型大会"
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "storeRoi"
+    )
+    .textContent =
+      roiFor(
+        "店舗トーナメント"
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "bestRank"
+    )
+    .textContent =
+      n
+        ? Math.min(
+            ...results.map(
+              r =>
+                Number(
+                  r.rank ||
+                  999
+                )
+            )
+          ) +
+          "位"
+        : "-";
+
+
+  document
+    .getElementById(
+      "bestProfit"
+    )
+    .textContent =
+      n
+        ? "¥" +
+          Math.max(
+            ...results.map(
+              profitOf
+            )
+          ).toLocaleString()
+        : "-";
+
+
+  const groups = {};
+
+
+  results.forEach(
+    r => {
+
+      const key =
+        r.store_id ||
+        "大型大会";
+
+
+      if(!groups[key]){
+
+        groups[key] = {
+
+          games:0,
+
+          profit:0
+
+        };
+
+      }
+
+
+      groups[key].games++;
+
+
+      groups[key].profit +=
+        profitOf(r);
+
+    }
+  );
+
+
+  document
+    .getElementById(
+      "storeAnalysis"
+    )
+    .innerHTML =
+      Object
+        .entries(groups)
+        .map(
+          ([k,v]) => `
+
+            <div class="mini">
+
+              <strong>
+                ${
+                  esc(
+                    k ===
+                    "大型大会"
+                      ? "大型大会"
+                      : k
+                  )
+                }
+              </strong>
+
+              <div class="muted">
+                ${v.games}大会
+              </div>
+
+              <div
+                class="${
+                  v.profit >= 0
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  v.profit >= 0
+                    ? "+"
+                    : ""
+                }
+
+                ¥${v.profit.toLocaleString()}
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")
+      ||
+      '<div class="loading">データがありません。</div>';
+
+}
+
+
+/* =========================
+   プロフィール
+========================= */
+
+async function loadProfile(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "profiles"
+      )
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(
+      "プロフィール取得エラー:",
+      error
+    );
+
+
+    showBox(
+      "profileMessage",
+      "プロフィール情報を取得できませんでした。",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  if(data){
+
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value =
+        data.display_name ||
+        "";
+
+
+    document
+      .getElementById(
+        "profileBio"
+      )
+      .value =
+        data.bio ||
+        "";
+
+  }
+
+}
+
+
+/* =========================
+   プロフィール保存
+========================= */
+
+async function saveProfile(){
+
+  if(!currentUser){
+
+    showBox(
+      "profileMessage",
+      "プロフィールを保存するにはログインしてください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const display_name =
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value
+      .trim();
+
+
+  const bio =
+    document
+      .getElementById(
+        "profileBio"
+      )
+      .value
+      .trim();
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "profiles"
+      )
+      .upsert(
+        {
+          id:
+            currentUser.id,
+
+          display_name,
+
+          bio
+
+        },
+        {
+          onConflict:"id"
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "プロフィール保存エラー:",
+      error
+    );
+
+
+    showBox(
+      "profileMessage",
+      getDatabaseErrorMessage(
+        error,
+        "プロフィールの保存"
+      ),
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  showBox(
+    "profileMessage",
+    "プロフィールを保存しました！",
+    "success"
+  );
+
+}
+
+
+/* =========================
+   バッジ
+========================= */
+
+function updateBadges(
+  results
+){
+
+  const n =
+    results.length;
+
+
+  const profit =
+    results.reduce(
+      (s,r) =>
+        s +
+        profitOf(r),
+      0
+    );
+
+
+  const wins =
+    results.filter(
+      r =>
+        Number(
+          r.rank
+        ) === 1
+    ).length;
+
+
+  const defs = [
+
+    [
+      "🎯",
+      "初参加",
+      "1大会以上",
+      n >= 1
+    ],
+
+    [
+      "🔥",
+      "10大会",
+      "10大会以上",
+      n >= 10
+    ],
+
+    [
+      "🏆",
+      "初優勝",
+      "優勝1回以上",
+      wins >= 1
+    ],
+
+    [
+      "💰",
+      "利益1万円",
+      "累計利益1万円以上",
+      profit >= 10000
+    ],
+
+    [
+      "🚀",
+      "50大会",
+      "50大会以上",
+      n >= 50
+    ],
+
+    [
+      "👑",
+      "100大会",
+      "100大会以上",
+      n >= 100
+    ]
+
+  ];
+
+
+  document
+    .getElementById(
+      "badges"
+    )
+    .innerHTML =
+      defs
+        .map(
+          x => `
+
+            <div
+              class="badge ${
+                x[3]
+                  ? "earned"
+                  : ""
+              }"
+            >
+
+              <div class="badge-icon">
+                ${x[0]}
+              </div>
+
+              <div class="badge-name">
+                ${x[1]}
+              </div>
+
+              <div class="badge-desc">
+                ${x[2]}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+}
+
+
+/* =========================
+   連続記録
+========================= */
+
+function updateStreak(
+  results
+){
+
+  if(!results.length){
+
+    document
+      .getElementById(
+        "streak"
+      )
+      .textContent =
+        "0大会";
+
+    return;
+
+  }
+
+
+  const dates =
+    [
+      ...new Set(
+        results
+          .map(
+            r =>
+              r.date
+          )
+          .filter(Boolean)
+      )
+    ]
+      .sort()
+      .reverse();
+
+
+  let streak =
+    0;
+
+
+  for(
+    let i = 0;
+    i < dates.length;
+    i++
+  ){
+
+    if(
+      i === 0 ||
+      new Date(
+        dates[i - 1]
+      ) -
+      new Date(
+        dates[i]
+      ) <=
+      86400000 * 31
+    ){
+
+      streak++;
+
+    }else{
+
+      break;
+
+    }
+
+  }
+
+
+  document
+    .getElementById(
+      "streak"
+    )
+    .textContent =
+      streak +
+      "大会";
+
+}
+
+
+/* =========================
+   目標
+========================= */
+
+async function loadGoals(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "player_goals"
+      )
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(
+      "目標取得エラー:",
+      error
+    );
+
+
+    showBox(
+      "goalMessage",
+      "目標情報を取得できませんでした。",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  if(data){
+
+    document
+      .getElementById(
+        "goalGames"
+      )
+      .value =
+        data.target_games ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalProfit"
+      )
+      .value =
+        data.target_profit ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalRoi"
+      )
+      .value =
+        data.target_roi ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalItm"
+      )
+      .value =
+        data.target_itm_rate ||
+        "";
+
+  }
+
+
+  renderGoalProgress(
+    data || {}
+  );
+
+}
+
+
+/* =========================
+   目標保存
+========================= */
+
+async function saveGoals(){
+
+  if(!currentUser){
+
+    showBox(
+      "goalMessage",
+      "目標を保存するにはログインしてください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const payload = {
+
+    user_id:
+      currentUser.id,
+
+    target_games:
+      Number(
+        document
+          .getElementById(
+            "goalGames"
+          )
+          .value ||
+          0
+      ),
+
+    target_profit:
+      Number(
+        document
+          .getElementById(
+            "goalProfit"
+          )
+          .value ||
+          0
+      ),
+
+    target_roi:
+      Number(
+        document
+          .getElementById(
+            "goalRoi"
+          )
+          .value ||
+          0
+      ),
+
+    target_itm_rate:
+      Number(
+        document
+          .getElementById(
+            "goalItm"
+          )
+          .value ||
+          0
+      )
+
+  };
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "player_goals"
+      )
+      .upsert(
+        payload,
+        {
+          onConflict:"user_id"
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "目標保存エラー:",
+      error
+    );
+
+
+    showBox(
+      "goalMessage",
+      getDatabaseErrorMessage(
+        error,
+        "目標の保存"
+      ),
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  showBox(
+    "goalMessage",
+    "🎯 目標を保存しました！",
+    "success"
+  );
+
+
+  renderGoalProgress(
+    payload
+  );
+
+}
+
+
+/* =========================
+   目標進捗
+========================= */
+
+function renderGoalProgress(
+  g
+){
+
+  const year =
+    new Date()
+      .getFullYear();
+
+
+  const rs =
+    allResults.filter(
+      r =>
+        (
+          r.date ||
+          ""
+        ).startsWith(
+          String(year)
+        )
+    );
+
+
+  const profit =
+    rs.reduce(
+      (s,r) =>
+        s +
+        profitOf(r),
+      0
+    );
+
+
+  const cost =
+    rs.reduce(
+      (s,r) =>
+        s +
+        costOf(r),
+      0
+    );
+
+
+  const itm =
+    rs.filter(
+      r =>
+        Number(
+          r.itm_rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) <=
+        Number(
+          r.itm_rank
+        )
+    ).length;
+
+
+  const roi =
+    cost
+      ? profit /
+        cost *
+        100
+      : 0;
+
+
+  const itmRate =
+    rs.length
+      ? itm /
+        rs.length *
+        100
+      : 0;
+
+
+  const item =
+    (
+      label,
+      value,
+      target
+    ) => `
+
+      <div class="mini">
+
+        <div class="mini-title">
+          ${label}
+        </div>
+
+        <div class="mini-value">
+          ${value}
+        </div>
+
+        <div class="progress">
+
+          <div
+            style="
+              width:${
+                target
+                  ? Math.min(
+                      100,
+                      Number(value) /
+                      Number(target) *
+                      100
+                    )
+                  : 0
+              }%
+            "
+          ></div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+  document
+    .getElementById(
+      "goalProgress"
+    )
+    .innerHTML = `
+
+      <div class="goal-grid">
+
+        ${item(
+          "年間大会数",
+          rs.length,
+          g.target_games
+        )}
+
+        ${item(
+          "年間利益",
+          "¥" +
+          profit.toLocaleString(),
+          g.target_profit
+        )}
+
+        ${item(
+          "ROI",
+          roi.toFixed(1) +
+          "%",
+          g.target_roi
+        )}
+
+        ${item(
+          "ITM率",
+          itmRate.toFixed(1) +
+          "%",
+          g.target_itm_rate
+        )}
+
+      </div>
+
+    `;
+
+}
+
+
+/* =========================
+   エラー表示
+========================= */
+
+function showBox(
+  id,
+  text,
+  type
+){
+
+  const e =
+    document.getElementById(
+      id
+    );
+
+
+  if(!e){
+
+    return;
+
+  }
+
+
+  e.textContent =
+    text;
+
+
+  e.className =
+    "message " +
+    type;
+
+}
+
+
+/* =========================
+   認証エラー
+========================= */
+
+function getAuthErrorMessage(
+  error
+){
+
+  const message =
+    String(
+      error?.message ||
+      ""
+    ).toLowerCase();
+
+
+  if(
+    message.includes(
+      "invalid login credentials"
+    )
+  ){
+
+    return "メールアドレスまたはパスワードが正しくありません。";
+
+  }
+
+
+  if(
+    message.includes(
+      "email not confirmed"
+    )
+  ){
+
+    return "メールアドレスの確認が完了していません。確認メールをご確認ください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "user already registered"
+    )
+  ){
+
+    return "このメールアドレスはすでに登録されています。ログインしてください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "password"
+    ) &&
+    message.includes(
+      "6"
+    )
+  ){
+
+    return "パスワードは6文字以上で入力してください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "rate limit"
+    )
+  ){
+
+    return "操作が集中しています。少し時間をおいてからもう一度お試しください。";
+
+  }
+
+
+  return "ログイン・新規登録に失敗しました。入力内容を確認してください。";
+
+}
+
+
+/* =========================
+   DBエラー
+========================= */
+
+function getDatabaseErrorMessage(
+  error,
+  action
+){
+
+  const message =
+    String(
+      error?.message ||
+      ""
+    ).toLowerCase();
+
+
+  if(
+    message.includes(
+      "row-level security"
+    )
+  ){
+
+    return `${action}に失敗しました。ログイン状態またはアクセス権限を確認してください。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "permission denied"
+    )
+  ){
+
+    return `${action}に失敗しました。この操作を行う権限がありません。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "schema cache"
+    )
+  ){
+
+    return `${action}に失敗しました。システム設定を確認する必要があります。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "duplicate"
+    )
+  ){
+
+    return `${action}に失敗しました。同じデータがすでに登録されています。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "network"
+    ) ||
+    message.includes(
+      "fetch"
+    )
+  ){
+
+    return `${action}に失敗しました。通信環境を確認してください。`;
+
+  }
+
+
+  return `${action}に失敗しました。時間をおいてもう一度お試しください。`;
+
+}
+
+
+/* =========================
+   おめでとう演出
+========================= */
+
+function showCelebrate(
+  text
+){
+
+  document
+    .getElementById(
+      "celebrateText"
+    )
+    .textContent =
+      text;
+
+
+  document
+    .getElementById(
+      "celebrate"
+    )
+    .classList
+    .add(
+      "show"
+    );
+
+
+  setTimeout(
+    closeCelebrate,
+    2200
+  );
+
+}
+
+
+function closeCelebrate(){
+
+  document
+    .getElementById(
+      "celebrate"
+    )
+    .classList
+    .remove(
+      "show"
+    );
+
+}
+
+
+/* =========================
+   HTMLエスケープ
+========================= */
+
+function esc(
+  v
+){
+
+  return String(
+    v ?? ""
+  )
+    .replace(
+      /[&<>"']/g,
+      c =>
+        ({
+          "&":
+            "&amp;",
+          "<":
+            "&lt;",
+          ">":
+            "&gt;",
+          '"':
+            "&quot;",
+          "'":
+            "&#039;"
+        }[c])
+    );
+
+}
+
+</script>
+
+</body>
+</html>
