@@ -15,25 +15,11 @@
   box-sizing:border-box
 }
 
-html{
-  width:100%;
-  min-height:100%;
-  overflow-x:hidden;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
 body{
   margin:0;
-  width:100%;
-  min-height:100%;
   background:#0b1020;
   color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;
-  overflow-x:hidden;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  touch-action:pan-y
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif
 }
 
 .container{
@@ -435,28 +421,6 @@ textarea{
   border-color:#5ce6ad
 }
 
-.delete-button{
-  border:1px solid #6b3542;
-  border-radius:10px;
-  padding:9px 12px;
-  background:#2a1820;
-  color:#ff8f9e;
-  font-weight:800;
-  cursor:pointer
-}
-
-.delete-button:hover{
-  background:#421c24;
-  border-color:#ff8f9e
-}
-
-.history-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  flex-wrap:wrap
-}
-
 .edit-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -464,7 +428,29 @@ textarea{
 }
 
 .rank-row{
-  grid-template-columns:55px 1fr 100px 100px
+  grid-template-columns:55px minmax(260px,1fr) 130px 80px;
+  gap:16px;
+  align-items:center
+}
+
+.rank-detail{
+  margin-top:6px;
+  color:#9da8bd;
+  font-size:13px;
+  line-height:1.6
+}
+
+.rank-location{
+  color:#c5ccdc
+}
+
+.rank-tournament{
+  color:#a8b1c7
+}
+
+.rank-date{
+  color:#7f8ba5;
+  margin-left:6px
 }
 
 .rank-no{
@@ -563,9 +549,6 @@ textarea{
 
 .modal-card{
   width:min(460px,100%);
-  max-height:90vh;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
   background:#11192d;
   border:1px solid #3a4a6b;
   border-radius:22px;
@@ -684,7 +667,17 @@ textarea{
   }
 
   .rank-row{
-    grid-template-columns:42px 1fr 80px
+    grid-template-columns:42px 1fr;
+    gap:10px
+  }
+
+  .rank-row > div:nth-child(3),
+  .rank-row > div:nth-child(4){
+    grid-column:2
+  }
+
+  .rank-detail{
+    font-size:12px
   }
 
   .badges{
@@ -697,45 +690,6 @@ textarea{
 
   .user-name{
     display:none
-  }
-
-  html,
-  body{
-    overflow-x:hidden;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    touch-action:pan-y
-  }
-
-  .container{
-    width:94%;
-    max-width:none;
-    padding-bottom:120px
-  }
-
-  .form-section{
-    width:100%;
-    padding:20px 16px 40px
-  }
-
-  input,
-  select,
-  textarea{
-    min-height:56px;
-    font-size:17px
-  }
-
-  textarea{
-    min-height:120px
-  }
-
-  .save-button,
-  .cancel-button{
-    min-height:58px
-  }
-
-  .history-actions{
-    justify-content:flex-start
   }
 
 }
@@ -1958,6 +1912,8 @@ let allResults = [];
 let currentTournamentPhotoUrl = null;
 
 let storeNameMap = {};
+
+let seriesNameMap = {};
 
 
 /* =========================
@@ -3693,6 +3649,10 @@ async function loadSeries(){
           x.name;
 
 
+        seriesNameMap[x.id] =
+          x.name;
+
+
         s.appendChild(o);
 
       }
@@ -4443,8 +4403,7 @@ function renderHistory(
 
               </div>
 
-              <div class="history-actions">
-
+              <div>
                 <button
                   type="button"
                   class="edit-button"
@@ -4452,15 +4411,6 @@ function renderHistory(
                 >
                   ✏️ 編集
                 </button>
-
-                <button
-                  type="button"
-                  class="delete-button"
-                  onclick="deleteResult('${esc(r.id)}')"
-                >
-                  🗑️ 削除
-                </button>
-
               </div>
 
             </div>
@@ -4626,186 +4576,6 @@ async function saveEditedResult(){
 
 
 /* =========================
-   戦績削除
-========================= */
-
-async function deleteResult(id){
-
-  if(!currentUser){
-    openAuth();
-    return;
-  }
-
-  const result =
-    allResults.find(
-      r => String(r.id) === String(id)
-    );
-
-  if(!result){
-    return;
-  }
-
-  const tournamentName =
-    result.tournament_name ||
-    "この戦績";
-
-  const confirmed =
-    window.confirm(
-      `「${tournamentName}」の戦績を削除しますか？\n\n削除すると元に戻せません。`
-    );
-
-  if(!confirmed){
-    return;
-  }
-
-  try{
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("poker_results")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", currentUser.id);
-
-    if(error){
-
-      console.error(
-        "戦績削除エラー:",
-        error
-      );
-
-      showBox(
-        "message",
-        getDatabaseErrorMessage(
-          error,
-          "戦績の削除"
-        ),
-        "error"
-      );
-
-      return;
-    }
-
-    /*
-      戦績に大会写真が紐づいている場合、
-      Storage上の写真も削除する。
-      写真削除に失敗しても戦績削除自体は成功扱いにする。
-    */
-
-    if(result.photo_url){
-
-      try{
-
-        const photoPath =
-          getPhotoStoragePath(
-            result.photo_url
-          );
-
-        if(photoPath){
-
-          const {
-            error: photoDeleteError
-          } =
-            await supabaseClient
-              .storage
-              .from("tournament-photos")
-              .remove([photoPath]);
-
-          if(photoDeleteError){
-
-            console.warn(
-              "大会写真の削除に失敗しました:",
-              photoDeleteError
-            );
-
-          }
-
-        }
-
-      }catch(photoError){
-
-        console.warn(
-          "大会写真削除エラー:",
-          photoError
-        );
-
-      }
-
-    }
-
-    await loadResults();
-
-    await loadRanking("month");
-
-    showBox(
-      "message",
-      "🗑️ 戦績を削除しました。",
-      "success"
-    );
-
-  }catch(error){
-
-    console.error(
-      "戦績削除エラー:",
-      error
-    );
-
-    showBox(
-      "message",
-      "戦績の削除に失敗しました。時間をおいてもう一度お試しください。",
-      "error"
-    );
-
-  }
-
-}
-
-
-/* =========================
-   大会写真URLからStorageパスを取得
-========================= */
-
-function getPhotoStoragePath(photoUrl){
-
-  if(!photoUrl){
-    return null;
-  }
-
-  try{
-
-    const marker =
-      "/storage/v1/object/public/tournament-photos/";
-
-    const index =
-      String(photoUrl).indexOf(marker);
-
-    if(index === -1){
-      return null;
-    }
-
-    return decodeURIComponent(
-      String(photoUrl).slice(
-        index + marker.length
-      )
-    );
-
-  }catch(error){
-
-    console.error(
-      "写真Storageパス取得エラー:",
-      error
-    );
-
-    return null;
-
-  }
-
-}
-
-
-/* =========================
    ランキング
 ========================= */
 
@@ -4849,6 +4619,10 @@ async function loadRanking(
   }
 
 
+  /* =========================
+     期間
+  ========================= */
+
   const now =
     new Date();
 
@@ -4869,6 +4643,25 @@ async function loadRanking(
         );
 
 
+  const startDate =
+    `${start.getFullYear()}-${
+      String(
+        start.getMonth() + 1
+      ).padStart(2,"0")
+    }-${
+      String(
+        start.getDate()
+      ).padStart(2,"0")
+    }`;
+
+
+  /* =========================
+     戦績取得
+
+     profilesとのJOINは使わず、
+     後からprofilesを別取得する。
+  ========================= */
+
   const {
     data,
     error
@@ -4877,17 +4670,28 @@ async function loadRanking(
       .from(
         "poker_results"
       )
-      .select(
-        "user_id,prize,buy_in,re_entry,rank,profiles(display_name)"
-      )
+      .select(`
+        id,
+        user_id,
+        date,
+        type,
+        store_id,
+        series_id,
+        tournament_name,
+        prize,
+        buy_in,
+        re_entry,
+        rank
+      `)
       .gte(
         "date",
-        start
-          .toISOString()
-          .slice(
-            0,
-            10
-          )
+        startDate
+      )
+      .order(
+        "date",
+        {
+          ascending:false
+        }
       );
 
 
@@ -4904,13 +4708,102 @@ async function loadRanking(
         "rankingList"
       )
       .innerHTML =
-        '<div class="message error" style="display:block">ランキングを取得できませんでした。</div>';
-
+        `
+        <div
+          class="message error"
+          style="display:block"
+        >
+          ランキングを取得できませんでした。<br>
+          <small>${esc(error.message || "")}</small>
+        </div>
+        `;
 
     return;
 
   }
 
+
+  /* =========================
+     プレイヤーID取得
+  ========================= */
+
+  const userIds =
+    [
+      ...new Set(
+        (data || [])
+          .map(
+            r =>
+              r.user_id
+          )
+          .filter(Boolean)
+      )
+    ];
+
+
+  /* =========================
+     profilesを別取得
+  ========================= */
+
+  let profiles = [];
+
+
+  if(userIds.length){
+
+    const {
+      data:profileData,
+      error:profileError
+    } =
+      await supabaseClient
+        .from(
+          "profiles"
+        )
+        .select(
+          "id,display_name"
+        )
+        .in(
+          "id",
+          userIds
+        );
+
+
+    if(profileError){
+
+      console.warn(
+        "プロフィール取得エラー:",
+        profileError
+      );
+
+    }else{
+
+      profiles =
+        profileData || [];
+
+    }
+
+  }
+
+
+  /* =========================
+     プロフィールMap
+  ========================= */
+
+  const profileMap = {};
+
+
+  profiles.forEach(
+    p => {
+
+      profileMap[p.id] =
+        p.display_name ||
+        "プレイヤー";
+
+    }
+  );
+
+
+  /* =========================
+     プレイヤー別集計
+  ========================= */
 
   const map = {};
 
@@ -4937,14 +4830,29 @@ async function loadRanking(
             id,
 
             name:
-              r.profiles?.display_name ||
+              profileMap[id] ||
               "プレイヤー",
 
             games:
               0,
 
             profit:
-              0
+              0,
+
+            latestDate:
+              "",
+
+            latestType:
+              "",
+
+            latestStore:
+              "",
+
+            latestSeries:
+              "",
+
+            latestTournament:
+              ""
 
           };
 
@@ -4968,18 +4876,70 @@ async function loadRanking(
             )
           );
 
+
+        /*
+          そのプレイヤーの
+          最新大会情報を保存
+        */
+
+        if(
+          !map[id].latestDate ||
+          r.date >
+          map[id].latestDate
+        ){
+
+          map[id].latestDate =
+            r.date || "";
+
+          map[id].latestType =
+            r.type || "";
+
+          map[id].latestTournament =
+            r.tournament_name ||
+            "";
+
+          map[id].latestStore =
+            r.store_id
+              ? (
+                  storeNameMap[
+                    r.store_id
+                  ] ||
+                  "店舗不明"
+                )
+              : "";
+
+          map[id].latestSeries =
+            r.series_id
+              ? (
+                  seriesNameMap[
+                    r.series_id
+                  ] ||
+                  "大会シリーズ不明"
+                )
+              : "";
+
+        }
+
       }
     );
 
 
-  renderRanking(
+  /* =========================
+     利益順
+  ========================= */
+
+  const rows =
     Object
       .values(map)
       .sort(
         (a,b) =>
           b.profit -
           a.profit
-      )
+      );
+
+
+  renderRanking(
+    rows
   );
 
 }
@@ -5012,59 +4972,137 @@ function renderRanking(
         50
       )
       .map(
-        (r,i) => `
+        (r,i) => {
 
-          <div class="rank-row">
+          /*
+            店舗トーナメントなら
+            店舗名＋場所を表示
 
-            <div class="rank-no">
-              ${i + 1}
+            大型大会なら
+            大会シリーズ＋大会名を表示
+          */
+
+          let locationText =
+            "";
+
+          let tournamentText =
+            r.latestTournament ||
+            "大会名不明";
+
+
+          if(
+            r.latestType ===
+            "店舗トーナメント"
+          ){
+
+            locationText =
+              r.latestStore ||
+              "店舗不明";
+
+          }else if(
+            r.latestType ===
+            "大型大会"
+          ){
+
+            locationText =
+              "大型大会";
+
+
+            if(
+              r.latestSeries
+            ){
+
+              tournamentText =
+                `${r.latestSeries} / ${tournamentText}`;
+
+            }
+
+          }else{
+
+            locationText =
+              "開催場所不明";
+
+          }
+
+
+          return `
+
+            <div class="rank-row">
+
+              <div class="rank-no">
+                ${i + 1}
+              </div>
+
+
+              <div>
+
+                <span class="rank-name">
+                  ${esc(r.name)}
+                </span>
+
+                <span class="muted">
+                  ${r.games}大会
+                </span>
+
+
+                <div class="rank-detail">
+
+                  <div class="rank-location">
+                    📍 ${esc(locationText)}
+                  </div>
+
+
+                  <div class="rank-tournament">
+                    🎰 ${esc(tournamentText)}
+
+                    ${
+                      r.latestDate
+                        ? `
+                          <span class="rank-date">
+                            ${esc(r.latestDate)}
+                          </span>
+                        `
+                        : ""
+                    }
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="${
+                  r.profit >= 0
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  r.profit >= 0
+                    ? "+"
+                    : ""
+                }
+
+                ¥${r.profit.toLocaleString()}
+
+              </div>
+
+
+              <div class="muted">
+                利益順
+              </div>
+
             </div>
 
+          `;
 
-            <div>
-
-              <span class="rank-name">
-                ${esc(r.name)}
-              </span>
-
-              <span class="muted">
-                ${r.games}大会
-              </span>
-
-            </div>
-
-
-            <div
-              class="${
-                r.profit >= 0
-                  ? "positive"
-                  : "negative"
-              }"
-            >
-
-              ${
-                r.profit >= 0
-                  ? "+"
-                  : ""
-              }
-
-              ¥${r.profit.toLocaleString()}
-
-            </div>
-
-
-            <div>
-              利益順
-            </div>
-
-          </div>
-
-        `
+        }
       )
       .join("");
 
 }
-
 
 /* =========================
    詳細分析
