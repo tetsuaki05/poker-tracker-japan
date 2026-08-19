@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>POKER TRACKER JAPAN</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box
+}
 
 body{
   margin:0;
@@ -71,7 +75,7 @@ button{
 
 .stats{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:1fr 1fr;
   gap:18px;
   margin-bottom:38px
 }
@@ -104,6 +108,11 @@ button{
   margin:34px 0 18px
 }
 
+.buttons{
+  display:grid;
+  gap:14px
+}
+
 .main-button{
   width:100%;
   border:0;
@@ -121,6 +130,11 @@ button{
   background:#5ce6ad;
   color:#071019
 }
+
+
+/* =========================
+   写真登録
+========================= */
 
 .photo-choice{
   display:none;
@@ -159,6 +173,10 @@ button{
   font-weight:800
 }
 
+.photo-choice-button:hover{
+  background:#243352
+}
+
 .photo-choice-icon{
   font-size:36px;
   display:block;
@@ -192,6 +210,11 @@ button{
   margin-top:10px;
   line-height:1.6
 }
+
+
+/* =========================
+   フォーム
+========================= */
 
 .form-section{
   display:none;
@@ -384,38 +407,24 @@ textarea{
   font-size:12px
 }
 
-.history-actions{
-  grid-column:1/-1;
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  margin-top:2px
-}
-
 .edit-button{
   border:1px solid #3a4a6b;
-  background:#1a243d;
-  color:#fff;
   border-radius:10px;
-  padding:9px 13px;
+  padding:9px 12px;
+  background:#1c2945;
+  color:#fff;
   font-weight:800;
   cursor:pointer
 }
 
 .edit-button:hover{
-  background:#243352
+  border-color:#5ce6ad
 }
 
-.history-store{
-  color:#c5ccdc;
-  font-size:14px;
-  margin-top:4px
-}
-
-.ranking-me{
-  font-size:12px;
-  color:#5ce6ad;
-  margin-left:6px
+.edit-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
 }
 
 .rank-row{
@@ -521,9 +530,7 @@ textarea{
   background:#11192d;
   border:1px solid #3a4a6b;
   border-radius:22px;
-  padding:25px;
-  max-height:90vh;
-  overflow:auto
+  padding:25px
 }
 
 .modal-title{
@@ -633,6 +640,10 @@ textarea{
     grid-template-columns:1fr 1fr
   }
 
+  .edit-grid{
+    grid-template-columns:1fr
+  }
+
   .rank-row{
     grid-template-columns:42px 1fr 80px
   }
@@ -648,7 +659,9 @@ textarea{
   .user-name{
     display:none
   }
+
 }
+
 </style>
 </head>
 
@@ -658,796 +671,967 @@ textarea{
 
 <header>
 
-<div>
+  <div>
 
-<div class="logo">
-♠ POKER TRACKER JAPAN
-</div>
+    <div class="logo">
+      ♠ POKER TRACKER JAPAN
+    </div>
 
-<div class="subtitle">
-日本のライブポーカー戦績管理
-</div>
+    <div class="subtitle">
+      日本のライブポーカー戦績管理
+    </div>
 
-</div>
+  </div>
 
-<div class="header-right">
+  <div class="header-right">
 
-<span
-id="userName"
-class="user-name"
->
-未ログイン
-</span>
+    <span
+      id="userName"
+      class="user-name"
+    >
+      未ログイン
+    </span>
 
-<button
-class="top-btn"
-id="authButton"
-onclick="openAuth()"
->
-🔐 ログイン
-</button>
+    <button
+      class="top-btn"
+      id="authButton"
+      onclick="openAuth()"
+    >
+      🔐 ログイン
+    </button>
 
-</div>
+  </div>
 
 </header>
 
 
 <div
-id="loginNotice"
-class="message error"
+  id="loginNotice"
+  class="message error"
 >
-戦績を保存・閲覧するにはログインしてください。
+  戦績を保存・閲覧するにはログインしてください。
 </div>
 
+
+<!-- =========================
+     STATS
+========================= -->
 
 <section class="stats">
 
-<div class="stat">
-<div class="stat-label">大会数</div>
-<div class="stat-value" id="totalGames">0</div>
-</div>
+  <div class="stat">
 
-<div class="stat">
-<div class="stat-label">ITM率</div>
-<div class="stat-value" id="itmRate">0%</div>
-</div>
+    <div class="stat-label">
+      大会数
+    </div>
 
-<div class="stat">
-<div class="stat-label">ROI</div>
-<div class="stat-value green" id="roi">0%</div>
-</div>
+    <div
+      class="stat-value"
+      id="totalGames"
+    >
+      0
+    </div>
 
-<div class="stat">
-<div class="stat-label">累計利益</div>
-<div class="stat-value" id="profit">¥0</div>
-</div>
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      ITM率
+    </div>
+
+    <div
+      class="stat-value"
+      id="itmRate"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      ROI
+    </div>
+
+    <div
+      class="stat-value green"
+      id="roi"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      累計利益
+    </div>
+
+    <div
+      class="stat-value"
+      id="profit"
+    >
+      ¥0
+    </div>
+
+  </div>
 
 </section>
 
+
+<!-- =========================
+     TABS
+========================= -->
 
 <div class="tabs">
 
-<button
-class="tab active"
-onclick="showTab('record',this)"
->
-✏️ 戦績登録
-</button>
+  <button
+    class="tab active"
+    onclick="showTab('record',this)"
+  >
+    ✏️ 戦績登録
+  </button>
 
-<button
-class="tab"
-onclick="showTab('history',this)"
->
-📋 戦績一覧
-</button>
+  <button
+    class="tab"
+    onclick="showTab('history',this)"
+  >
+    📋 戦績一覧
+  </button>
 
-<button
-class="tab"
-onclick="showTab('ranking',this)"
->
-🏆 ランキング
-</button>
+  <button
+    class="tab"
+    onclick="showTab('ranking',this)"
+  >
+    🏆 ランキング
+  </button>
 
-<button
-class="tab"
-onclick="showTab('analysis',this)"
->
-📊 詳細分析
-</button>
+  <button
+    class="tab"
+    onclick="showTab('analysis',this)"
+  >
+    📊 詳細分析
+  </button>
 
-<button
-class="tab"
-onclick="showTab('profile',this)"
->
-👤 プロフィール
-</button>
+  <button
+    class="tab"
+    onclick="showTab('profile',this)"
+  >
+    👤 プロフィール
+  </button>
 
-<button
-class="tab"
-onclick="showTab('goals',this)"
->
-🎯 目標
-</button>
+  <button
+    class="tab"
+    onclick="showTab('goals',this)"
+  >
+    🎯 目標
+  </button>
 
 </div>
 
 
+<!-- =========================
+     戦績登録
+========================= -->
+
 <section
-id="record"
-class="tab-panel active"
+  id="record"
+  class="tab-panel active"
 >
 
 <h2 class="section-title">
-戦績を記録
+  戦績を記録
 </h2>
 
+
+<!-- 写真登録 -->
+
 <button
-class="main-button primary"
-onclick="showPhotoForm()"
+  class="main-button primary"
+  onclick="showPhotoForm()"
 >
-📷 大会写真から登録
+  📷 大会写真から登録
 </button>
 
 
+<!-- 写真選択 -->
+
 <div
-id="photoChoice"
-class="photo-choice"
+  id="photoChoice"
+  class="photo-choice"
 >
 
-<div class="photo-choice-title">
-大会写真を選択
+  <div class="photo-choice-title">
+    大会写真を選択
+  </div>
+
+
+  <div class="photo-choice-buttons">
+
+    <button
+      type="button"
+      class="photo-choice-button"
+      onclick="openPhotoLibrary()"
+    >
+
+      <span class="photo-choice-icon">
+        🖼️
+      </span>
+
+      写真ボックスから選択
+
+    </button>
+
+
+    <button
+      type="button"
+      class="photo-choice-button"
+      onclick="openCamera()"
+    >
+
+      <span class="photo-choice-icon">
+        📸
+      </span>
+
+      カメラで撮影
+
+    </button>
+
+  </div>
+
 </div>
 
-<div class="photo-choice-buttons">
 
-<button
-type="button"
-class="photo-choice-button"
-onclick="openPhotoLibrary()"
+<!-- 写真アプリ -->
+
+<input
+  type="file"
+  id="photoLibraryInput"
+  accept="image/*"
+  class="hidden"
+  onchange="handlePhotoUpload(event)"
 >
 
-<span class="photo-choice-icon">
-🖼️
-</span>
 
-写真ボックスから選択
+<!-- カメラ -->
 
+<input
+  type="file"
+  id="cameraInput"
+  accept="image/*"
+  capture="environment"
+  class="hidden"
+  onchange="handlePhotoUpload(event)"
+>
+
+
+<!-- 写真プレビュー -->
+
+<div
+  id="photoPreview"
+  class="photo-preview"
+>
+
+  <img
+    id="previewImage"
+    src=""
+    alt="大会写真"
+  >
+
+  <div
+    id="photoInfo"
+    class="photo-info"
+  >
+    写真を読み込んでいます...
+  </div>
+
+</div>
+
+
+<!-- 手入力 -->
+
+<button
+  class="main-button"
+  onclick="showForm()"
+>
+  ✏️ 手入力で記録
 </button>
 
 
-<button
-type="button"
-class="photo-choice-button"
-onclick="openCamera()"
->
-
-<span class="photo-choice-icon">
-📸
-</span>
-
-カメラで撮影
-
-</button>
-
-</div>
-
-</div>
-
-
-<input
-type="file"
-id="photoLibraryInput"
-accept="image/*"
-class="hidden"
-onchange="handlePhotoUpload(event)"
->
-
-
-<input
-type="file"
-id="cameraInput"
-accept="image/*"
-capture="environment"
-class="hidden"
-onchange="handlePhotoUpload(event)"
->
-
+<!-- =========================
+     戦績フォーム
+========================= -->
 
 <div
-id="photoPreview"
-class="photo-preview"
+  id="formSection"
+  class="form-section"
 >
 
-<img
-id="previewImage"
-src=""
-alt="大会写真"
->
+  <div class="form-title">
+    戦績を登録
+  </div>
 
-<div
-id="photoInfo"
-class="photo-info"
->
-写真を読み込んでいます...
-</div>
 
-</div>
+  <div class="form-group">
 
+    <label>
+      大会区分
+    </label>
 
-<button
-class="main-button"
-onclick="showForm()"
->
-✏️ 手入力で記録
-</button>
+    <select
+      id="type"
+      onchange="changeType()"
+    >
 
+      <option value="店舗トーナメント">
+        店舗トーナメント
+      </option>
 
-<div
-id="formSection"
-class="form-section"
->
+      <option value="大型大会">
+        大型大会
+      </option>
 
-<div class="form-title">
-戦績を登録
-</div>
+    </select>
 
+  </div>
 
-<div class="form-group">
 
-<label>
-大会区分
-</label>
+  <div
+    class="form-group"
+    id="storeGroup"
+  >
 
-<select
-id="type"
-onchange="changeType()"
->
+    <label>
+      店舗
+    </label>
 
-<option value="店舗トーナメント">
-店舗トーナメント
-</option>
+    <select id="storeId">
 
-<option value="大型大会">
-大型大会
-</option>
+      <option value="">
+        店舗を選択してください
+      </option>
 
-</select>
+    </select>
 
-</div>
+  </div>
 
 
-<div
-class="form-group"
-id="storeGroup"
->
+  <div
+    class="form-group hidden"
+    id="seriesGroup"
+  >
 
-<label>
-店舗
-</label>
+    <label>
+      大会シリーズ
+    </label>
 
-<select id="storeId">
+    <select id="seriesId">
 
-<option value="">
-店舗を選択してください
-</option>
+      <option value="">
+        大会シリーズを選択してください
+      </option>
 
-</select>
+    </select>
 
-</div>
+  </div>
 
 
-<div
-class="form-group hidden"
-id="seriesGroup"
->
+  <div class="form-group">
 
-<label>
-大会シリーズ
-</label>
+    <label>
+      大会名
+    </label>
 
-<select id="seriesId">
+    <input
+      id="tournamentName"
+      placeholder="大会名"
+    >
 
-<option value="">
-大会シリーズを選択してください
-</option>
+  </div>
 
-</select>
 
-</div>
+  <div class="grid2">
 
+    <div class="form-group">
 
-<div class="form-group">
+      <label>
+        開催日
+      </label>
 
-<label>
-大会名
-</label>
+      <input
+        id="date"
+        type="date"
+      >
 
-<input
-id="tournamentName"
-placeholder="大会名"
->
+    </div>
 
-</div>
 
+    <div class="form-group">
 
-<div class="grid2">
+      <label>
+        Buy-in（円）
+      </label>
 
-<div class="form-group">
+      <input
+        id="buyIn"
+        type="number"
+        min="0"
+        placeholder="Buy-in"
+      >
 
-<label>
-開催日
-</label>
+    </div>
 
-<input
-id="date"
-type="date"
->
+  </div>
 
-</div>
 
+  <div class="grid2">
 
-<div class="form-group">
+    <div class="form-group">
 
-<label>
-Buy-in（円）
-</label>
+      <label>
+        リエントリー回数
+      </label>
 
-<input
-id="buyIn"
-type="number"
-min="0"
-placeholder="Buy-in"
->
+      <input
+        id="reEntry"
+        type="number"
+        min="0"
+        value="0"
+      >
 
-</div>
+      <div class="muted">
+        ※リエントリーは手入力
+      </div>
 
-</div>
+    </div>
 
 
-<div class="grid2">
+    <div class="form-group">
 
-<div class="form-group">
+      <label>
+        参加人数
+      </label>
 
-<label>
-リエントリー回数
-</label>
+      <input
+        id="players"
+        type="number"
+        min="1"
+        placeholder="参加人数"
+      >
 
-<input
-id="reEntry"
-type="number"
-min="0"
-value="0"
->
+    </div>
 
-<div class="muted">
-※リエントリーは手入力
-</div>
+  </div>
 
-</div>
 
+  <div class="grid2">
 
-<div class="form-group">
+    <div class="form-group">
 
-<label>
-参加人数
-</label>
+      <label>
+        順位
+      </label>
 
-<input
-id="players"
-type="number"
-min="1"
-placeholder="参加人数"
->
+      <input
+        id="rank"
+        type="number"
+        min="1"
+        placeholder="自分の順位"
+      >
 
-</div>
+    </div>
 
-</div>
 
+    <div class="form-group">
 
-<div class="grid2">
+      <label>
+        ITM順位（入賞ライン）
+      </label>
 
-<div class="form-group">
+      <input
+        id="itmRank"
+        type="number"
+        min="1"
+        placeholder="例：15"
+      >
 
-<label>
-順位
-</label>
+    </div>
 
-<input
-id="rank"
-type="number"
-min="1"
-placeholder="自分の順位"
->
+  </div>
 
-</div>
 
+  <div class="form-group">
 
-<div class="form-group">
+    <label>
+      賞金（円）
+    </label>
 
-<label>
-ITM順位（入賞ライン）
-</label>
+    <input
+      id="prize"
+      type="number"
+      min="0"
+      value="0"
+    >
 
-<input
-id="itmRank"
-type="number"
-min="1"
-placeholder="例：15"
->
+  </div>
 
-</div>
 
-</div>
+  <div class="form-group">
 
+    <label>
+      メモ
+    </label>
 
-<div class="form-group">
+    <textarea
+      id="memo"
+      placeholder="大会の感想・反省点など"
+    ></textarea>
 
-<label>
-賞金（円）
-</label>
+  </div>
 
-<input
-id="prize"
-type="number"
-min="0"
-value="0"
->
 
-</div>
+  <button
+    class="save-button"
+    onclick="saveResult()"
+  >
+    💾 戦績を保存
+  </button>
 
 
-<div class="form-group">
+  <button
+    class="cancel-button"
+    onclick="hideForm()"
+  >
+    キャンセル
+  </button>
 
-<label>
-メモ
-</label>
 
-<textarea
-id="memo"
-placeholder="大会の感想・反省点など"
-></textarea>
-
-</div>
-
-
-<button
-class="save-button"
-onclick="saveResult()"
->
-💾 戦績を保存
-</button>
-
-
-<button
-class="cancel-button"
-onclick="hideForm()"
->
-キャンセル
-</button>
-
-
-<div
-id="message"
-class="message"
-></div>
+  <div
+    id="message"
+    class="message"
+  ></div>
 
 </div>
 
 </section>
 
 
+<!-- =========================
+     戦績一覧
+========================= -->
+
 <section
-id="history"
-class="tab-panel"
+  id="history"
+  class="tab-panel"
 >
 
 <h2 class="section-title">
-📋 戦績一覧
+  📋 戦績一覧
 </h2>
 
 <div
-id="historyList"
-class="list"
+  id="historyList"
+  class="list"
 >
 
-<div class="loading">
-ログインすると表示されます
-</div>
+  <div class="loading">
+    ログインすると表示されます
+  </div>
 
 </div>
 
 </section>
 
 
+<!-- =========================
+     ランキング
+========================= -->
+
 <section
-id="ranking"
-class="tab-panel"
+  id="ranking"
+  class="tab-panel"
 >
 
 <h2 class="section-title">
-🏆 プレイヤーランキング
+  🏆 プレイヤーランキング
 </h2>
 
 <div class="panel">
 
-<div class="tabs">
+  <div class="tabs">
 
-<button
-class="tab active"
-onclick="loadRanking('month',this)"
->
-今月
-</button>
+    <button
+      class="tab active"
+      onclick="loadRanking('month',this)"
+    >
+      今月
+    </button>
 
-<button
-class="tab"
-onclick="loadRanking('year',this)"
->
-今年
-</button>
+    <button
+      class="tab"
+      onclick="loadRanking('year',this)"
+    >
+      今年
+    </button>
 
-</div>
+  </div>
 
-<div
-id="rankingList"
-class="list"
->
 
-<div class="loading">
-ログインしてください
-</div>
+  <div
+    id="rankingList"
+    class="list"
+  >
 
-</div>
+    <div class="loading">
+      ログインしてください
+    </div>
+
+  </div>
 
 </div>
 
 </section>
 
 
+<!-- =========================
+     分析
+========================= -->
+
 <section
-id="analysis"
-class="tab-panel"
+  id="analysis"
+  class="tab-panel"
 >
 
 <h2 class="section-title">
-📊 詳細分析
+  📊 詳細分析
 </h2>
+
 
 <div class="analysis-grid">
 
-<div class="mini">
-<div class="mini-title">平均順位</div>
-<div class="mini-value" id="avgRank">-</div>
-</div>
+  <div class="mini">
 
-<div class="mini">
-<div class="mini-title">平均参加人数</div>
-<div class="mini-value" id="avgPlayers">-</div>
-</div>
+    <div class="mini-title">
+      平均順位
+    </div>
 
-<div class="mini">
-<div class="mini-title">大型大会ROI</div>
-<div class="mini-value" id="largeRoi">-</div>
-</div>
+    <div
+      class="mini-value"
+      id="avgRank"
+    >
+      -
+    </div>
 
-<div class="mini">
-<div class="mini-title">店舗トーナメントROI</div>
-<div class="mini-value" id="storeRoi">-</div>
-</div>
+  </div>
 
-<div class="mini">
-<div class="mini-title">最高順位</div>
-<div class="mini-value" id="bestRank">-</div>
-</div>
 
-<div class="mini">
-<div class="mini-title">最大利益</div>
-<div class="mini-value" id="bestProfit">-</div>
-</div>
+  <div class="mini">
+
+    <div class="mini-title">
+      平均参加人数
+    </div>
+
+    <div
+      class="mini-value"
+      id="avgPlayers"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      大型大会ROI
+    </div>
+
+    <div
+      class="mini-value"
+      id="largeRoi"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      店舗トーナメントROI
+    </div>
+
+    <div
+      class="mini-value"
+      id="storeRoi"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      最高順位
+    </div>
+
+    <div
+      class="mini-value"
+      id="bestRank"
+    >
+      -
+    </div>
+
+  </div>
+
+
+  <div class="mini">
+
+    <div class="mini-title">
+      最大利益
+    </div>
+
+    <div
+      class="mini-value"
+      id="bestProfit"
+    >
+      -
+    </div>
+
+  </div>
 
 </div>
 
 
 <h2 class="section-title">
-🏪 店舗別分析
+  🏪 店舗別分析
 </h2>
 
+
 <div
-id="storeAnalysis"
-class="list"
+  id="storeAnalysis"
+  class="list"
 >
 
-<div class="loading">
-ログインしてください
-</div>
+  <div class="loading">
+    ログインしてください
+  </div>
 
 </div>
 
 </section>
 
+
+<!-- =========================
+     プロフィール
+========================= -->
 
 <section
-id="profile"
-class="tab-panel"
+  id="profile"
+  class="tab-panel"
 >
 
 <h2 class="section-title">
-👤 プロフィール
+  👤 プロフィール
+</h2>
+
+
+<div class="panel">
+
+  <div class="profile-grid">
+
+    <div class="form-group">
+
+      <label>
+        表示名
+      </label>
+
+      <input
+        id="profileName"
+        placeholder="プレイヤー名"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        自己紹介
+      </label>
+
+      <input
+        id="profileBio"
+        placeholder="一言"
+      >
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="save-button"
+    onclick="saveProfile()"
+  >
+    プロフィールを保存
+  </button>
+
+
+  <div
+    id="profileMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<h2 class="section-title">
+  🏅 バッジ
+</h2>
+
+<div
+  id="badges"
+  class="badges"
+></div>
+
+
+<h2 class="section-title">
+  🔥 連続記録
 </h2>
 
 <div class="panel">
 
-<div class="profile-grid">
+  <div class="mini-title">
+    連続大会参加
+  </div>
 
-<div class="form-group">
-
-<label>
-表示名
-</label>
-
-<input
-id="profileName"
-placeholder="プレイヤー名"
->
-
-</div>
-
-<div class="form-group">
-
-<label>
-自己紹介
-</label>
-
-<input
-id="profileBio"
-placeholder="一言"
->
-
-</div>
-
-</div>
-
-<button
-class="save-button"
-onclick="saveProfile()"
->
-プロフィールを保存
-</button>
-
-<div
-id="profileMessage"
-class="message"
-></div>
-
-</div>
-
-
-<h2 class="section-title">
-🏅 バッジ
-</h2>
-
-<div
-id="badges"
-class="badges"
-></div>
-
-
-<h2 class="section-title">
-🔥 連続記録
-</h2>
-
-<div class="panel">
-
-<div class="mini-title">
-連続大会参加
-</div>
-
-<div
-class="mini-value"
-id="streak"
->
-0大会
-</div>
+  <div
+    class="mini-value"
+    id="streak"
+  >
+    0大会
+  </div>
 
 </div>
 
 </section>
 
+
+<!-- =========================
+     目標
+========================= -->
 
 <section
-id="goals"
-class="tab-panel"
+  id="goals"
+  class="tab-panel"
 >
 
 <h2 class="section-title">
-🎯 目標設定
+  🎯 目標設定
 </h2>
+
 
 <div class="panel">
 
-<div class="goal-grid">
+  <div class="goal-grid">
 
-<div class="form-group">
+    <div class="form-group">
 
-<label>
-年間大会数目標
-</label>
+      <label>
+        年間大会数目標
+      </label>
 
-<input
-id="goalGames"
-type="number"
-min="1"
-placeholder="100"
->
+      <input
+        id="goalGames"
+        type="number"
+        min="1"
+        placeholder="100"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        年間利益目標（円）
+      </label>
+
+      <input
+        id="goalProfit"
+        type="number"
+        min="0"
+        placeholder="100000"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        目標ROI（%）
+      </label>
+
+      <input
+        id="goalRoi"
+        type="number"
+        step="0.1"
+        placeholder="20"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        目標ITM率（%）
+      </label>
+
+      <input
+        id="goalItm"
+        type="number"
+        step="0.1"
+        placeholder="30"
+      >
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="save-button"
+    onclick="saveGoals()"
+  >
+    🎯 目標を保存
+  </button>
+
+
+  <div
+    id="goalMessage"
+    class="message"
+  ></div>
 
 </div>
 
-<div class="form-group">
-
-<label>
-年間利益目標（円）
-</label>
-
-<input
-id="goalProfit"
-type="number"
-min="0"
-placeholder="100000"
->
-
-</div>
-
-<div class="form-group">
-
-<label>
-目標ROI（%）
-</label>
-
-<input
-id="goalRoi"
-type="number"
-step="0.1"
-placeholder="20"
->
-
-</div>
-
-<div class="form-group">
-
-<label>
-目標ITM率（%）
-</label>
-
-<input
-id="goalItm"
-type="number"
-step="0.1"
-placeholder="30"
->
-
-</div>
-
-</div>
-
-<button
-class="save-button"
-onclick="saveGoals()"
->
-🎯 目標を保存
-</button>
 
 <div
-id="goalMessage"
-class="message"
-></div>
-
-</div>
-
-
-<div
-id="goalProgress"
-class="panel"
-style="margin-top:16px"
+  id="goalProgress"
+  class="panel"
+  style="margin-top:16px"
 ></div>
 
 </section>
@@ -1455,361 +1639,212 @@ style="margin-top:16px"
 </div>
 
 
+<!-- =========================
+     ログイン
+========================= -->
+
 <div
-id="authModal"
-class="modal"
+  id="authModal"
+  class="modal"
 >
 
 <div class="modal-card">
 
+  <div
+    class="modal-title"
+    id="authTitle"
+  >
+    🔐 ログイン
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      メールアドレス
+    </label>
+
+    <input
+      id="authEmail"
+      type="email"
+      autocomplete="email"
+    >
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>
+      パスワード
+    </label>
+
+    <input
+      id="authPassword"
+      type="password"
+      autocomplete="current-password"
+    >
+
+  </div>
+
+
+  <div class="modal-actions">
+
+    <button
+      class="save-button"
+      onclick="submitAuth()"
+    >
+      ログイン
+    </button>
+
+
+    <button
+      class="cancel-button"
+      onclick="toggleAuthMode()"
+      id="authModeButton"
+    >
+      新規登録に切り替え
+    </button>
+
+
+    <button
+      class="cancel-button"
+      onclick="closeAuth()"
+    >
+      閉じる
+    </button>
+
+  </div>
+
+
+  <div
+    id="authMessage"
+    class="message"
+  ></div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     戦績編集
+========================= -->
+
 <div
-class="modal-title"
-id="authTitle"
->
-🔐 ログイン
-</div>
-
-
-<div class="form-group">
-
-<label>
-メールアドレス
-</label>
-
-<input
-id="authEmail"
-type="email"
-autocomplete="email"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-パスワード
-</label>
-
-<input
-id="authPassword"
-type="password"
-autocomplete="current-password"
->
-
-</div>
-
-
-<div class="modal-actions">
-
-<button
-class="save-button"
-onclick="submitAuth()"
->
-ログイン
-</button>
-
-
-<button
-class="cancel-button"
-onclick="toggleAuthMode()"
-id="authModeButton"
->
-新規登録に切り替え
-</button>
-
-
-<button
-class="cancel-button"
-onclick="closeAuth()"
->
-閉じる
-</button>
-
-</div>
-
-
-<div
-id="authMessage"
-class="message"
-></div>
-
-</div>
-
-</div>
-
-
-<div
-id="editModal"
-class="modal"
+  id="editModal"
+  class="modal"
 >
 
 <div class="modal-card">
 
-<div class="modal-title">
-✏️ 戦績を編集
+  <div class="modal-title">
+    ✏️ 戦績を編集
+  </div>
+
+  <input
+    id="editId"
+    type="hidden"
+  >
+
+  <div class="form-group">
+    <label>大会名</label>
+    <input id="editTournamentName">
+  </div>
+
+  <div class="edit-grid">
+
+    <div class="form-group">
+      <label>開催日</label>
+      <input id="editDate" type="date">
+    </div>
+
+    <div class="form-group">
+      <label>Buy-in（円）</label>
+      <input id="editBuyIn" type="number" min="0">
+    </div>
+
+    <div class="form-group">
+      <label>リエントリー回数</label>
+      <input id="editReEntry" type="number" min="0">
+    </div>
+
+    <div class="form-group">
+      <label>参加人数</label>
+      <input id="editPlayers" type="number" min="1">
+    </div>
+
+    <div class="form-group">
+      <label>順位</label>
+      <input id="editRank" type="number" min="1">
+    </div>
+
+    <div class="form-group">
+      <label>ITM順位</label>
+      <input id="editItmRank" type="number" min="0">
+    </div>
+
+    <div class="form-group">
+      <label>賞金（円）</label>
+      <input id="editPrize" type="number" min="0">
+    </div>
+
+  </div>
+
+  <div class="form-group">
+    <label>メモ</label>
+    <textarea id="editMemo"></textarea>
+  </div>
+
+  <div class="modal-actions">
+    <button
+      class="save-button"
+      onclick="saveEditedResult()"
+    >
+      💾 変更を保存
+    </button>
+
+    <button
+      class="cancel-button"
+      onclick="closeEditModal()"
+    >
+      キャンセル
+    </button>
+  </div>
+
+  <div id="editMessage" class="message"></div>
+
+</div>
+
 </div>
 
 
-<div class="form-group">
-
-<label>
-大会区分
-</label>
-
-<select
-id="editType"
-onchange="changeEditType()"
->
-
-<option value="店舗トーナメント">
-店舗トーナメント
-</option>
-
-<option value="大型大会">
-大型大会
-</option>
-
-</select>
-
-</div>
-
+<!-- =========================
+     保存完了
+========================= -->
 
 <div
-class="form-group"
-id="editStoreGroup"
->
-
-<label>
-店舗
-</label>
-
-<select id="editStoreId">
-
-<option value="">
-店舗を選択してください
-</option>
-
-</select>
-
-</div>
-
-
-<div
-class="form-group hidden"
-id="editSeriesGroup"
->
-
-<label>
-大会シリーズ
-</label>
-
-<select id="editSeriesId">
-
-<option value="">
-大会シリーズを選択してください
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-大会名
-</label>
-
-<input
-id="editTournamentName"
-placeholder="大会名"
->
-
-</div>
-
-
-<div class="grid2">
-
-<div class="form-group">
-
-<label>
-開催日
-</label>
-
-<input
-id="editDate"
-type="date"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Buy-in（円）
-</label>
-
-<input
-id="editBuyIn"
-type="number"
-min="0"
->
-
-</div>
-
-</div>
-
-
-<div class="grid2">
-
-<div class="form-group">
-
-<label>
-リエントリー回数
-</label>
-
-<input
-id="editReEntry"
-type="number"
-min="0"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-参加人数
-</label>
-
-<input
-id="editPlayers"
-type="number"
-min="1"
->
-
-</div>
-
-</div>
-
-
-<div class="grid2">
-
-<div class="form-group">
-
-<label>
-順位
-</label>
-
-<input
-id="editRank"
-type="number"
-min="1"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-ITM順位（入賞ライン）
-</label>
-
-<input
-id="editItmRank"
-type="number"
-min="1"
->
-
-</div>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-賞金（円）
-</label>
-
-<input
-id="editPrize"
-type="number"
-min="0"
->
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-メモ
-</label>
-
-<textarea
-id="editMemo"
-placeholder="大会の感想・反省点など"
-></textarea>
-
-</div>
-
-
-<div class="modal-actions">
-
-<button
-class="save-button"
-onclick="saveEditedResult()"
->
-💾 変更を保存
-</button>
-
-<button
-class="cancel-button"
-onclick="closeEditModal()"
->
-キャンセル
-</button>
-
-</div>
-
-
-<div
-id="editMessage"
-class="message"
-></div>
-
-</div>
-
-</div>
-
-
-<div
-id="celebrate"
-class="celebrate"
-onclick="closeCelebrate()"
+  id="celebrate"
+  class="celebrate"
+  onclick="closeCelebrate()"
 >
 
 <div class="celebrate-card">
 
-<div class="celebrate-emoji">
-🎉
-</div>
+  <div class="celebrate-emoji">
+    🎉
+  </div>
 
-<div class="celebrate-title">
-おめでとう！
-</div>
+  <div class="celebrate-title">
+    おめでとう！
+  </div>
 
-<div
-class="celebrate-text"
-id="celebrateText"
->
-戦績を登録しました！
-</div>
+  <div
+    class="celebrate-text"
+    id="celebrateText"
+  >
+    戦績を登録しました！
+  </div>
 
 </div>
 
@@ -1818,26 +1853,33 @@ id="celebrateText"
 
 <script>
 
+
+/* =========================
+   Supabase
+========================= */
+
 const SUPABASE_URL =
-"https://whbmhkfvhyrdyfmtapzh.supabase.co";
+  "https://whbmhkfvhyrdyfmtapzh.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
+  "sb_publishable_lo3jCQw7sLLRqFN27aH_5w_IpPJYA3q";
 
 const supabaseClient =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
 let currentUser = null;
+
 let authMode = "login";
+
 let allResults = [];
-let stores = [];
-let series = [];
+
 let currentTournamentPhotoUrl = null;
-let editingResultId = null;
+
+let storeNameMap = {};
 
 
 /* =========================
@@ -1845,136 +1887,84 @@ let editingResultId = null;
 ========================= */
 
 document.addEventListener(
-"DOMContentLoaded",
-async () => {
+  "DOMContentLoaded",
+  async () => {
 
-document.getElementById("date").value =
-getLocalDate();
+    document
+      .getElementById("date")
+      .value = getLocalDate();
 
-await Promise.all([
-loadStores(),
-loadSeries()
-]);
 
-const {
-data:{
-session
-}
-} =
-await supabaseClient
-.auth
-.getSession();
+    await loadStores();
 
-await applySession(session);
+    await loadSeries();
 
-supabaseClient
-.auth
-.onAuthStateChange(
-async (
-_event,
-session
-) => {
 
-await applySession(
-session
-);
+    const {
+      data:{
+        session
+      }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
 
-}
-);
 
-}
+    await applySession(session);
+
+
+    supabaseClient
+      .auth
+      .onAuthStateChange(
+        async (
+          _event,
+          session
+        ) => {
+
+          await applySession(
+            session
+          );
+
+        }
+      );
+
+  }
 );
 
 
 /* =========================
-   日付
+   日本時間の日付
 ========================= */
 
 function getLocalDate(){
 
-const d =
-new Date();
-
-return `${d.getFullYear()}-${String(
-d.getMonth()+1
-).padStart(2,"0")}-${String(
-d.getDate()
-).padStart(2,"0")}`;
-
-}
+  const now =
+    new Date();
 
 
-/* =========================
-   共通
-========================= */
+  const year =
+    now.getFullYear();
 
-function esc(v){
 
-return String(
-v ?? ""
-)
-.replace(
-/[&<>"']/g,
-c =>
-({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[c])
-);
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
 
-}
 
-function yen(v){
+  const day =
+    String(
+      now.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
 
-return "¥" +
-Number(
-v || 0
-).toLocaleString(
-"ja-JP"
-);
 
-}
-
-function costOf(r){
-
-return Number(
-r.buy_in || 0
-) *
-(
-1 +
-Number(
-r.re_entry || 0
-)
-);
-
-}
-
-function profitOf(r){
-
-return Number(
-r.prize || 0
-) -
-costOf(r);
-
-}
-
-function isItm(r){
-
-return Number(
-r.itm_rank
-) > 0 &&
-Number(
-r.rank
-) > 0 &&
-Number(
-r.rank
-) <=
-Number(
-r.itm_rank
-);
+  return `${year}-${month}-${day}`;
 
 }
 
@@ -1984,243 +1974,230 @@ r.itm_rank
 ========================= */
 
 async function applySession(
-session
+  session
 ){
 
-currentUser =
-session?.user || null;
+  currentUser =
+    session?.user || null;
 
 
-document
-.getElementById(
-"loginNotice"
-)
-.classList
-.toggle(
-"hidden",
-!!currentUser
-);
+  document
+    .getElementById("loginNotice")
+    .classList
+    .toggle(
+      "hidden",
+      !!currentUser
+    );
 
 
-document
-.getElementById(
-"authButton"
-)
-.textContent =
-currentUser
-? "🚪 ログアウト"
-: "🔐 ログイン";
+  document
+    .getElementById("authButton")
+    .textContent =
+      currentUser
+        ? "🚪 ログアウト"
+        : "🔐 ログイン";
 
 
-document
-.getElementById(
-"userName"
-)
-.textContent =
-currentUser
-? (
-currentUser.user_metadata?.display_name ||
-currentUser.email ||
-"ログイン中"
-)
-: "未ログイン";
+  document
+    .getElementById("userName")
+    .textContent =
+      currentUser
+        ? currentUser.email ||
+          "ログイン中"
+        : "未ログイン";
 
 
-if(currentUser){
+  if(currentUser){
 
-await Promise.all([
+    await loadProfile();
 
-loadProfile(),
+    await loadResults();
 
-loadResults(),
+    await loadGoals();
 
-loadGoals(),
+    await loadRanking(
+      "month"
+    );
 
-loadRanking("month")
+  }else{
 
-]);
+    allResults = [];
 
-}else{
+    updateStats([]);
 
-allResults = [];
+    renderHistory([]);
 
-updateStats([]);
+    renderRanking([]);
 
-renderHistory([]);
-
-renderRanking([]);
-
-updateAnalysis([]);
-
-updateBadges([]);
-
-updateStreak([]);
-
-renderGoalProgress({});
-
-}
+  }
 
 }
 
 
 /* =========================
-   認証
+   ログイン
 ========================= */
 
 function openAuth(){
 
-if(currentUser){
+  if(currentUser){
 
-supabaseClient
-.auth
-.signOut();
+    supabaseClient
+      .auth
+      .signOut();
 
-return;
+    return;
 
-}
+  }
 
-document
-.getElementById(
-"authModal"
-)
-.classList
-.add(
-"show"
-);
+
+  document
+    .getElementById("authModal")
+    .classList
+    .add("show");
 
 }
 
 
 function closeAuth(){
 
-document
-.getElementById(
-"authModal"
-)
-.classList
-.remove(
-"show"
-);
+  document
+    .getElementById("authModal")
+    .classList
+    .remove("show");
 
 }
 
 
 function toggleAuthMode(){
 
-authMode =
-authMode === "login"
-? "signup"
-: "login";
+  authMode =
+    authMode === "login"
+      ? "signup"
+      : "login";
 
 
-document
-.getElementById(
-"authTitle"
-)
-.textContent =
-authMode === "login"
-? "🔐 ログイン"
-: "🆕 新規登録";
+  document
+    .getElementById("authTitle")
+    .textContent =
+      authMode === "login"
+        ? "🔐 ログイン"
+        : "🆕 新規登録";
 
 
-document
-.querySelector(
-"#authModal .save-button"
-)
-.textContent =
-authMode === "login"
-? "ログイン"
-: "新規登録";
+  document
+    .querySelector(
+      "#authModal .save-button"
+    )
+    .textContent =
+      authMode === "login"
+        ? "ログイン"
+        : "新規登録";
 
 
-document
-.getElementById(
-"authModeButton"
-)
-.textContent =
-authMode === "login"
-? "新規登録に切り替え"
-: "ログインに切り替え";
+  document
+    .getElementById(
+      "authModeButton"
+    )
+    .textContent =
+      authMode === "login"
+        ? "新規登録に切り替え"
+        : "ログインに切り替え";
 
 }
 
 
 async function submitAuth(){
 
-const email =
-document
-.getElementById(
-"authEmail"
-)
-.value
-.trim();
+  const email =
+    document
+      .getElementById(
+        "authEmail"
+      )
+      .value
+      .trim();
 
-const password =
-document
-.getElementById(
-"authPassword"
-)
-.value;
 
-if(!email || !password){
+  const password =
+    document
+      .getElementById(
+        "authPassword"
+      )
+      .value;
 
-showBox(
-"authMessage",
-"メールアドレスとパスワードを入力してください。",
-"error"
-);
 
-return;
+  if(
+    !email ||
+    !password
+  ){
 
-}
+    showBox(
+      "authMessage",
+      "メールアドレスとパスワードを入力してください。",
+      "error"
+    );
 
-const res =
-authMode === "login"
+    return;
 
-? await supabaseClient
-.auth
-.signInWithPassword({
-email,
-password
-})
+  }
 
-: await supabaseClient
-.auth
-.signUp({
-email,
-password
-});
 
-if(res.error){
+  const res =
+    authMode === "login"
 
-showBox(
-"authMessage",
-getAuthErrorMessage(
-res.error
-),
-"error"
-);
+      ? await supabaseClient
+          .auth
+          .signInWithPassword({
+            email,
+            password
+          })
 
-return;
+      : await supabaseClient
+          .auth
+          .signUp({
+            email,
+            password
+          });
 
-}
 
-if(
-authMode === "signup" &&
-!res.data.session
-){
+  if(res.error){
 
-showBox(
-"authMessage",
-"確認メールを送信しました。メールを確認してください。",
-"success"
-);
+    console.error(
+      "認証エラー:",
+      res.error
+    );
 
-return;
 
-}
+    showBox(
+      "authMessage",
+      getAuthErrorMessage(
+        res.error
+      ),
+      "error"
+    );
 
-closeAuth();
+    return;
+
+  }
+
+
+  if(
+    authMode === "signup" &&
+    !res.data.session
+  ){
+
+    showBox(
+      "authMessage",
+      "確認メールを送信しました。メールを確認してアカウントを有効にしてください。",
+      "success"
+    );
+
+    return;
+
+  }
+
+
+  closeAuth();
 
 }
 
@@ -2230,675 +2207,1143 @@ closeAuth();
 ========================= */
 
 function showTab(
-id,
-btn
+  id,
+  btn
 ){
 
-document
-.querySelectorAll(
-".tab-panel"
-)
-.forEach(
-x =>
-x.classList.remove(
-"active"
-)
-);
+  document
+    .querySelectorAll(
+      ".tab-panel"
+    )
+    .forEach(
+      x =>
+        x.classList.remove(
+          "active"
+        )
+    );
 
-document
-.getElementById(
-id
-)
-.classList
-.add(
-"active"
-);
 
-if(btn){
+  document
+    .getElementById(id)
+    .classList
+    .add("active");
 
-btn.parentElement
-.querySelectorAll(
-".tab"
-)
-.forEach(
-x =>
-x.classList.remove(
-"active"
-)
-);
 
-btn.classList.add(
-"active"
-);
+  if(btn){
 
-}
+    btn.parentElement
+      .querySelectorAll(
+        ".tab"
+      )
+      .forEach(
+        x =>
+          x.classList.remove(
+            "active"
+          )
+      );
+
+
+    btn.classList.add(
+      "active"
+    );
+
+  }
 
 }
 
 
 /* =========================
-   手入力
+   手入力フォーム
 ========================= */
 
 function showForm(){
 
-if(!currentUser){
+  if(!currentUser){
 
-openAuth();
+    openAuth();
 
-return;
+    return;
+
+  }
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
 
 }
 
-document
-.getElementById(
-"formSection"
-)
-.classList
-.add(
-"show"
-);
-
-document
-.getElementById(
-"formSection"
-)
-.scrollIntoView({
-behavior:"smooth"
-});
-
-}
 
 function hideForm(){
 
-document
-.getElementById(
-"formSection"
-)
-.classList
-.remove(
-"show"
-);
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .remove("show");
 
 }
 
 
 /* =========================
-   写真
+   写真登録開始
 ========================= */
 
 function showPhotoForm(){
 
-if(!currentUser){
+  if(!currentUser){
 
-openAuth();
+    openAuth();
 
-return;
+    return;
 
-}
+  }
 
-const e =
-document.getElementById(
-"photoChoice"
-);
 
-e.classList.toggle(
-"show"
-);
+  const choice =
+    document.getElementById(
+      "photoChoice"
+    );
 
-e.scrollIntoView({
-behavior:"smooth",
-block:"center"
-});
 
-}
+  choice
+    .classList
+    .toggle("show");
 
-function openPhotoLibrary(){
 
-document
-.getElementById(
-"photoLibraryInput"
-)
-.click();
-
-}
-
-function openCamera(){
-
-document
-.getElementById(
-"cameraInput"
-)
-.click();
+  choice.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
 
 }
 
 
 /* =========================
-   OCR
+   写真ボックス
 ========================= */
 
+function openPhotoLibrary(){
+
+  document
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .click();
+
+}
+
+
+/* =========================
+   カメラ
+========================= */
+
+function openCamera(){
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
+    .click();
+
+}
+
+
+/* =========================================================
+   写真選択
+   ★ ここからOCR仕様変更
+========================================================= */
+
 async function handlePhotoUpload(
-event
+  event
 ){
 
-const file =
-event.target.files?.[0];
+  const file =
+    event.target.files?.[0];
 
-if(!file)return;
 
-if(
-!file.type.startsWith(
-"image/"
-)
-){
+  if(!file){
 
-showBox(
-"message",
-"画像ファイルを選択してください。",
-"error"
-);
+    return;
 
-return;
+  }
+
+
+  if(
+    !file.type.startsWith(
+      "image/"
+    )
+  ){
+
+    showBox(
+      "message",
+      "画像ファイルを選択してください。",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /*
+    写真を選択した日を開催日にする
+  */
+
+  document
+    .getElementById("date")
+    .value =
+      getLocalDate();
+
+
+  /*
+    写真選択画面を閉じる
+  */
+
+  document
+    .getElementById(
+      "photoChoice"
+    )
+    .classList
+    .remove("show");
+
+
+  /*
+    写真プレビュー
+  */
+
+  const preview =
+    document.getElementById(
+      "previewImage"
+    );
+
+
+  const previewBox =
+    document.getElementById(
+      "photoPreview"
+    );
+
+
+  preview.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  previewBox
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "photoInfo"
+    )
+    .textContent =
+      "📖 大会名・参加人数を読み取っています...";
+
+
+  /*
+    入力フォーム表示
+  */
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .classList
+    .add("show");
+
+
+  document
+    .getElementById(
+      "formSection"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+
+  currentTournamentPhotoUrl = null;
+
+
+  try{
+
+    /*
+      OCR
+    */
+
+    const ocrData =
+      await runOCR(
+        file
+      );
+
+
+    console.log(
+      "OCR結果:",
+      ocrData
+    );
+
+
+    /*
+      OCR解析
+    */
+
+    const parsed =
+      parseTournamentText(
+        ocrData
+      );
+
+
+    /*
+      =========================
+      大会名
+      =========================
+    */
+
+    if(
+      parsed.tournamentName
+    ){
+
+      document
+        .getElementById(
+          "tournamentName"
+        )
+        .value =
+          parsed.tournamentName;
+
+    }
+
+
+    /*
+      =========================
+      参加人数
+      =========================
+    */
+
+    if(
+      parsed.players
+    ){
+
+      document
+        .getElementById(
+          "players"
+        )
+        .value =
+          parsed.players;
+
+    }
+
+
+    /*
+      =========================
+      Buy-in
+      =========================
+
+      ★ 自動入力しない
+    */
+
+
+    /*
+      =========================
+      リエントリー
+      =========================
+
+      ★ 自動入力しない
+    */
+
+    document
+      .getElementById(
+        "reEntry"
+      )
+      .value =
+        "0";
+
+
+    /*
+      写真をSupabaseへ保存
+    */
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        "📤 大会写真を保存しています...";
+
+
+    const photoUrl =
+      await uploadTournamentPhoto(
+        file
+      );
+
+
+    currentTournamentPhotoUrl =
+      photoUrl;
+
+
+    /*
+      完了メッセージ
+    */
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        parsed.tournamentName ||
+        parsed.players
+          ? "✅ 大会名・参加人数を読み取りました。Buy-in・順位などは手入力してください。"
+          : "⚠️ 大会名・参加人数を読み取れませんでした。手入力してください。";
+
+
+    showBox(
+      "message",
+      parsed.tournamentName ||
+      parsed.players
+        ? "📷 大会名と参加人数を読み取りました。必要なら修正してください。"
+        : "⚠️ 自動読み取りに失敗しました。手入力してください。",
+      parsed.tournamentName ||
+      parsed.players
+        ? "success"
+        : "error"
+    );
+
+  }catch(error){
+
+    currentTournamentPhotoUrl = null;
+
+    console.error(
+      "写真処理エラー:",
+      error
+    );
+
+
+    document
+      .getElementById(
+        "photoInfo"
+      )
+      .textContent =
+        "⚠️ 写真の自動読み取りに失敗しました。手入力してください。";
+
+
+    showBox(
+      "message",
+      "写真の読み取りに失敗しました。大会名・参加人数を手入力してください。",
+      "error"
+    );
+
+  }
 
 }
 
-document
-.getElementById(
-"date"
-)
-.value =
-getLocalDate();
 
-document
-.getElementById(
-"photoChoice"
-)
-.classList
-.remove(
-"show"
-);
-
-document
-.getElementById(
-"previewImage"
-)
-.src =
-URL.createObjectURL(
-file
-);
-
-document
-.getElementById(
-"photoPreview"
-)
-.classList
-.add(
-"show"
-);
-
-document
-.getElementById(
-"photoInfo"
-)
-.textContent =
-"📖 大会名・参加人数を読み取っています...";
-
-document
-.getElementById(
-"formSection"
-)
-.classList
-.add(
-"show"
-);
-
-document
-.getElementById(
-"formSection"
-)
-.scrollIntoView({
-behavior:"smooth"
-});
-
-currentTournamentPhotoUrl =
-null;
-
-try{
-
-const parsed =
-parseTournamentText(
-await runOCR(file)
-);
-
-if(
-parsed.tournamentName
-){
-
-document
-.getElementById(
-"tournamentName"
-)
-.value =
-parsed.tournamentName;
-
-}
-
-if(
-parsed.players
-){
-
-document
-.getElementById(
-"players"
-)
-.value =
-parsed.players;
-
-}
-
-document
-.getElementById(
-"reEntry"
-)
-.value =
-"0";
-
-document
-.getElementById(
-"photoInfo"
-)
-.textContent =
-(
-parsed.tournamentName ||
-parsed.players
-)
-? "✅ 大会名・参加人数を読み取りました。必要なら修正してください。"
-: "⚠️ 読み取れませんでした。手入力してください。";
-
-currentTournamentPhotoUrl =
-await uploadTournamentPhoto(
-file
-);
-
-showBox(
-"message",
-(
-parsed.tournamentName ||
-parsed.players
-)
-? "📷 大会名と参加人数を読み取りました。"
-: "⚠️ 自動読み取りに失敗しました。手入力してください。",
-(
-parsed.tournamentName ||
-parsed.players
-)
-? "success"
-: "error"
-);
-
-}catch(error){
-
-console.error(
-error
-);
-
-document
-.getElementById(
-"photoInfo"
-)
-.textContent =
-"⚠️ 写真処理に失敗しました。手入力してください。";
-
-showBox(
-"message",
-"写真の読み取りまたは保存に失敗しました。手入力してください。",
-"error"
-);
-
-}
-
-}
-
+/* =========================================================
+   OCR
+   ★ 大会名と参加人数だけを狙って読み取る
+========================================================= */
 
 async function runOCR(
-file
+  file
 ){
 
-const img =
-await loadImage(
-file
-);
+  if(!window.Tesseract){
 
-const tournamentText =
-await ocrRegion(
-img,
-{
-x:.05,
-y:.02,
-width:.9,
-height:.35
-},
-"大会名を読み取り中..."
-);
+    await loadTesseract();
 
-const playersText =
-await ocrRegion(
-img,
-{
-x:0,
-y:.25,
-width:.5,
-height:.5
-},
-"参加人数を読み取り中..."
-);
+  }
 
-return {
-tournamentText,
-playersText
-};
+
+  /*
+    元画像を読み込む
+  */
+
+  const img =
+    await loadImage(
+      file
+    );
+
+
+  /*
+    =========================
+    大会名
+    =========================
+
+    写真上部中央
+
+    例：
+
+    Holiday NLH 3.5K
+  */
+
+  document
+    .getElementById(
+      "photoInfo"
+    )
+    .textContent =
+      "📖 大会名を読み取っています...";
+
+
+  const tournamentText =
+    await ocrRegion(
+      img,
+      {
+        x:0.10,
+        y:0.03,
+        width:0.80,
+        height:0.30
+      },
+      "大会名を読み取り中..."
+    );
+
+
+  /*
+    =========================
+    参加人数
+    =========================
+
+    写真左側
+
+    PLAYERS
+
+    2/26
+  */
+
+  document
+    .getElementById(
+      "photoInfo"
+    )
+    .textContent =
+      "📖 参加人数を読み取っています...";
+
+
+  const playersText =
+    await ocrRegion(
+      img,
+      {
+        x:0.00,
+        y:0.28,
+        width:0.42,
+        height:0.45
+      },
+      "参加人数を読み取り中..."
+    );
+
+
+  console.log(
+    "大会名OCR:",
+    tournamentText
+  );
+
+
+  console.log(
+    "参加人数OCR:",
+    playersText
+  );
+
+
+  return {
+
+    tournamentText,
+
+    playersText
+
+  };
 
 }
 
+
+/* =========================
+   画像読み込み
+========================= */
 
 function loadImage(
-file
+  file
 ){
 
-return new Promise(
-(
-resolve,
-reject
-) => {
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
 
-const img =
-new Image();
+      const img =
+        new Image();
 
-const reader =
-new FileReader();
 
-reader.onload =
-() => {
+      const reader =
+        new FileReader();
 
-img.onload =
-() => resolve(
-img
-);
 
-img.onerror =
-() =>
-reject(
-new Error(
-"画像読み込み失敗"
-)
-);
+      reader.onload =
+        () => {
 
-img.src =
-reader.result;
+          img.onload =
+            () => {
 
-};
+              resolve(
+                img
+              );
 
-reader.onerror =
-() =>
-reject(
-new Error(
-"ファイル読み込み失敗"
-)
-);
+            };
 
-reader.readAsDataURL(
-file
-);
+
+          img.onerror =
+            () => {
+
+              reject(
+                new Error(
+                  "画像の読み込みに失敗しました"
+                )
+              );
+
+            };
+
+
+          img.src =
+            reader.result;
+
+        };
+
+
+      reader.onerror =
+        () => {
+
+          reject(
+            new Error(
+              "画像ファイルの読み込みに失敗しました"
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
 
 }
-);
 
-}
 
+/* =========================================================
+   OCR領域
+========================================================= */
 
 async function ocrRegion(
-img,
-region,
-message
+  img,
+  region,
+  message
 ){
 
-const canvas =
-document.createElement(
-"canvas"
-);
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
 
-const sw =
-img.width *
-region.width;
 
-const sh =
-img.height *
-region.height;
+  /*
+    元画像から対象部分だけ切り出す
+  */
 
-const scale =
-Math.max(
-3,
-2400 /
-sw
-);
+  const sourceWidth =
+    img.width *
+    region.width;
 
-canvas.width =
-Math.round(
-sw *
-scale
-);
 
-canvas.height =
-Math.round(
-sh *
-scale
-);
+  const sourceHeight =
+    img.height *
+    region.height;
 
-const ctx =
-canvas.getContext(
-"2d"
-);
 
-ctx.filter =
-"contrast(1.45) brightness(1.08)";
+  /*
+    OCR用に大きくする
 
-ctx.drawImage(
-img,
-img.width *
-region.x,
-img.height *
-region.y,
-sw,
-sh,
-0,
-0,
-canvas.width,
-canvas.height
-);
+    小さい文字をTesseractが
+    読みやすくするため
+  */
 
-const result =
-await Tesseract.recognize(
-canvas,
-"eng",
-{
-logger:m => {
+  const scale =
+    Math.max(
+      3,
+      2400 / sourceWidth
+    );
 
-if(
-m.status ===
-"recognizing text"
-){
 
-document
-.getElementById(
-"photoInfo"
-)
-.textContent =
-`📖 ${message} ${Math.round(
-(m.progress || 0) *
-100
-)}%`;
+  canvas.width =
+    Math.round(
+      sourceWidth *
+      scale
+    );
+
+
+  canvas.height =
+    Math.round(
+      sourceHeight *
+      scale
+    );
+
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  /*
+    コントラスト・明るさ調整
+  */
+
+  ctx.filter =
+    "contrast(1.45) brightness(1.08)";
+
+
+  ctx.drawImage(
+
+    img,
+
+    img.width *
+      region.x,
+
+    img.height *
+      region.y,
+
+    sourceWidth,
+    sourceHeight,
+
+    0,
+    0,
+
+    canvas.width,
+    canvas.height
+
+  );
+
+
+  /*
+    OCR
+  */
+
+  const result =
+    await Tesseract.recognize(
+
+      canvas,
+
+      "eng",
+
+      {
+
+        logger:m => {
+
+          if(
+            m.status ===
+            "recognizing text"
+          ){
+
+            const progress =
+              Math.round(
+                (m.progress || 0) * 100
+              );
+
+
+            const info =
+              document.getElementById(
+                "photoInfo"
+              );
+
+
+            if(info){
+
+              info.textContent =
+                `📖 ${message} ${progress}%`;
+
+            }
+
+          }
+
+        },
+
+        config:{
+
+          tessedit_pageseg_mode:"6",
+
+          preserve_interword_spaces:"1"
+
+        }
+
+      }
+
+    );
+
+
+  return (
+    result?.data?.text ||
+    ""
+  );
 
 }
 
-},
-config:{
-tessedit_pageseg_mode:
-"6",
-preserve_interword_spaces:
-"1"
-}
-}
-);
 
-return result?.data?.text || "";
+/* =========================
+   Tesseract読み込み
+========================= */
+
+function loadTesseract(){
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
+
+      if(window.Tesseract){
+
+        resolve();
+
+        return;
+
+      }
+
+
+      const script =
+        document.createElement(
+          "script"
+        );
+
+
+      script.src =
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+
+
+      script.onload =
+        resolve;
+
+
+      script.onerror =
+        () => {
+
+          reject(
+            new Error(
+              "OCRエンジンの読み込みに失敗しました"
+            )
+          );
+
+        };
+
+
+      document
+        .head
+        .appendChild(
+          script
+        );
+
+    }
+  );
 
 }
 
+
+/* =========================================================
+   OCR解析
+   ★ 大会名＋参加人数のみ
+========================================================= */
 
 function parseTournamentText(
-data
+  data
 ){
 
-const tournamentText =
-String(
-data?.tournamentText || ""
-);
+  const result = {
 
-const playersText =
-String(
-data?.playersText || ""
-);
+    tournamentName:"",
+    players:""
 
-const lines =
-tournamentText
-.replace(
-/\r/g,
-""
-)
-.split(
-"\n"
-)
-.map(
-x =>
-x
-.replace(
-/\s+/g,
-" "
-)
-.trim()
-)
-.filter(
-Boolean
-);
+  };
 
-let candidate =
-lines.find(
-x =>
-/NLH|PLO|HOLIDAY|MAIN|EVENT|TOURNAMENT|DAILY|TURBO|DEEP|MYSTERY|CHAMPIONSHIP|POKER/i
-.test(
-x
-)
-);
 
-if(!candidate){
+  const tournamentText =
+    String(
+      data?.tournamentText ||
+      ""
+    );
 
-candidate =
-lines
-.filter(
-x =>
-x.length >= 3
-)
-.sort(
-(a,b) =>
-b.length -
-a.length
-)[0] ||
-"";
+
+  const playersText =
+    String(
+      data?.playersText ||
+      ""
+    );
+
+
+  console.log(
+    "大会名OCR全文:",
+    tournamentText
+  );
+
+
+  console.log(
+    "参加人数OCR全文:",
+    playersText
+  );
+
+
+  /*
+    ========================================
+    大会名
+    ========================================
+
+    Holiday NLH 3.5K
+
+    のような文字を探す
+  */
+
+  const tournamentLines =
+    tournamentText
+      .replace(
+        /\r/g,
+        ""
+      )
+      .split("\n")
+      .map(
+        line =>
+          line
+            .replace(
+              /\s+/g,
+              " "
+            )
+            .trim()
+      )
+      .filter(Boolean);
+
+
+  /*
+    大会名として認識しやすいキーワード
+  */
+
+  const tournamentCandidates =
+    tournamentLines.filter(
+      line =>
+        !/^\d+[\s,./-]*\d*$/.test(line) &&
+        !/^(?:AVERAGE|AVG|CHIPCOUNT|BLINDS?|LEVEL|STACK|PLAYERS?)\b/i.test(line) &&
+        !/\b\d{1,3}[,.]?\d{3}\b/.test(line)
+    );
+
+
+  let tournamentCandidate =
+    tournamentCandidates.find(
+      line =>
+        /NLH|PLO|HOLIDAY|MAIN|EVENT|TOURNAMENT|DAILY|TURBO|DEEP|MYSTERY|CHAMPIONSHIP|POKER/i
+          .test(line)
+    );
+
+
+  /*
+    キーワードが無い場合
+
+    文字数が一番長い行を候補にする
+  */
+
+  if(!tournamentCandidate){
+
+    tournamentCandidate =
+      tournamentCandidates
+        .filter(
+          line =>
+            line.length >= 3
+        )
+        .sort(
+          (a,b) =>
+            b.length -
+            a.length
+        )[0] ||
+        "";
+
+  }
+
+
+  if(tournamentCandidate){
+
+    result.tournamentName =
+      cleanTournamentName(
+        tournamentCandidate
+      );
+
+  }
+
+
+  /*
+    ========================================
+    参加人数
+    ========================================
+
+    PLAYERS
+
+    2/26
+
+    ↓
+
+    26
+  */
+
+  let playerMatch =
+    playersText.match(
+      /PLAYERS?[\s\S]{0,50}?\b\d+\s*\/\s*(\d+)\b/i
+    );
+
+
+  /*
+    PLAYERSが認識されなかった場合
+
+    2/26
+
+    を探す
+  */
+
+  if(!playerMatch){
+
+    playerMatch =
+      playersText.match(
+        /\b\d+\s*\/\s*(\d+)\b/
+      );
+
+  }
+
+
+  /*
+    OCRで
+
+    2 / 26
+
+    と認識された場合
+  */
+
+  if(!playerMatch){
+
+    playerMatch =
+      playersText.match(
+        /\b\d+\s*[\/\\]\s*(\d+)\b/
+      );
+
+  }
+
+
+  if(playerMatch){
+
+    result.players =
+      playerMatch[1];
+
+  }
+
+
+  /*
+    ========================================
+    万が一
+
+    2/26
+
+    のスラッシュが認識されなかった場合
+    数字を拾う
+    ========================================
+  */
+
+  if(!result.players){
+
+    const numbers =
+      playersText.match(
+        /\b\d+\b/g
+      ) || [];
+
+
+    /*
+      10以上の数字を優先
+
+      26
+      50
+      100
+
+      など
+    */
+
+    const candidates =
+      numbers
+        .map(
+          n =>
+            Number(n)
+        )
+        .filter(
+          n =>
+            n >= 10 &&
+            n <= 10000
+        );
+
+
+    if(candidates.length){
+
+      result.players =
+        String(
+          Math.max(
+            ...candidates
+          )
+        );
+
+    }
+
+  }
+
+
+  console.log(
+    "OCR最終解析結果:",
+    result
+  );
+
+
+  return result;
 
 }
 
-let playerMatch =
-playersText.match(
-/PLAYERS?[\s\S]{0,60}?\b\d+\s*[\/\\]\s*(\d+)\b/i
-) ||
-playersText.match(
-/\b\d+\s*[\/\\]\s*(\d+)\b/
-);
 
-if(!playerMatch){
-
-const nums =
-(
-playersText.match(
-/\b\d+\b/g
-) || []
-)
-.map(
-Number
-)
-.filter(
-n =>
-n >= 10 &&
-n <= 10000
-);
-
-if(
-nums.length
-){
-
-playerMatch = [
-null,
-String(
-Math.max(
-...nums
-)
-)
-];
-
-}
-
-}
-
-return {
-
-tournamentName:
-cleanTournamentName(
-candidate
-),
-
-players:
-playerMatch?.[1] || ""
-
-};
-
-}
-
+/* =========================
+   大会名クリーニング
+========================= */
 
 function cleanTournamentName(
-name
+  name
 ){
 
-return String(
-name || ""
-)
+  return String(
+    name || ""
+  )
 
-.replace(
-/^[^a-zA-Z0-9ぁ-んァ-ヶ一-龯]+/,
-""
-)
+    .replace(
+      /^[^a-zA-Z0-9ぁ-んァ-ヶ一-龯]+/,
+      ""
+    )
 
-.replace(
-/[^a-zA-Z0-9ぁ-んァ-ヶ一-龯\s&'’\-#]+$/g,
-""
-)
+    .replace(
+      /[^a-zA-Z0-9ぁ-んァ-ヶ一-龯\s&'’\-#]+$/g,
+      ""
+    )
 
-.replace(
-/\s+/g,
-" "
-)
+    .replace(
+      /\s+/g,
+      " "
+    )
 
-.trim();
+    .trim();
 
 }
 
@@ -2908,62 +3353,113 @@ name || ""
 ========================= */
 
 async function uploadTournamentPhoto(
-file
+  file
 ){
 
-if(!currentUser){
+  if(!currentUser){
 
-throw new Error(
-"ログインしてください"
-);
+    throw new Error(
+      "ログインしてください"
+    );
+
+  }
+
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase() ||
+      "jpg";
+
+
+  const filePath =
+    `${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "tournament-photos"
+      )
+      .upload(
+        filePath,
+        file,
+        {
+          cacheControl:"3600",
+          upsert:false,
+          contentType:file.type
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "写真アップロードエラー:",
+      error
+    );
+
+    throw error;
+
+  }
+
+
+  const {
+    data:publicData
+  } =
+    supabaseClient
+      .storage
+      .from(
+        "tournament-photos"
+      )
+      .getPublicUrl(
+        data.path
+      );
+
+
+  return publicData.publicUrl;
 
 }
 
-const extension =
-file.name
-.split(".")
-.pop()
-.toLowerCase() ||
-"jpg";
 
-const path =
-`${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+/* =========================
+   大会区分
+========================= */
 
-const {
-data,
-error
-} =
-await supabaseClient
-.storage
-.from(
-"tournament-photos"
-)
-.upload(
-path,
-file,
-{
-cacheControl:"3600",
-upsert:false,
-contentType:file.type
-}
-);
+function changeType(){
 
-if(error){
+  const large =
+    document
+      .getElementById("type")
+      .value ===
+      "大型大会";
 
-throw error;
 
-}
+  document
+    .getElementById(
+      "storeGroup"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      large
+    );
 
-return supabaseClient
-.storage
-.from(
-"tournament-photos"
-)
-.getPublicUrl(
-data.path
-)
-.data
-.publicUrl;
+
+  document
+    .getElementById(
+      "seriesGroup"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      !large
+    );
 
 }
 
@@ -2974,475 +3470,540 @@ data.path
 
 async function loadStores(){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from(
-"poker_stores"
-)
-.select(
-"id,name,location"
-)
-.order(
-"name"
-);
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_stores"
+      )
+      .select(
+        "id,name,location"
+      );
 
-if(error){
 
-console.error(
-error
-);
+  if(error){
 
-return;
+    console.error(
+      "店舗取得エラー:",
+      error
+    );
 
-}
+    return;
 
-stores =
-data || [];
+  }
 
-const s =
-document.getElementById(
-"storeId"
-);
 
-s.innerHTML =
-'<option value="">店舗を選択してください</option>';
+  const s =
+    document.getElementById(
+      "storeId"
+    );
 
-stores.forEach(
-x => {
 
-const o =
-document.createElement(
-"option"
-);
+  s.innerHTML =
+    '<option value="">店舗を選択してください</option>';
 
-o.value =
-x.id;
 
-o.textContent =
-x.location
-? `${x.name}（${x.location}）`
-: x.name;
+  storeNameMap = {};
 
-s.appendChild(
-o
-);
 
-}
-);
+  (data || [])
+    .sort(
+      (a,b) =>
+        a.name.localeCompare(
+          b.name,
+          "ja"
+        )
+    )
+    .forEach(
+      x => {
+
+        const o =
+          document.createElement(
+            "option"
+          );
+
+
+        o.value =
+          x.id;
+
+
+        storeNameMap[x.id] =
+          x.location
+            ? `${x.name}（${x.location}）`
+            : x.name;
+
+
+        o.textContent =
+          x.location
+            ? `${x.name}（${x.location}）`
+            : x.name;
+
+
+        s.appendChild(o);
+
+      }
+    );
 
 }
 
 
 /* =========================
-   シリーズ
+   大会シリーズ
 ========================= */
 
 async function loadSeries(){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from(
-"tournament_series"
-)
-.select(
-"id,name"
-)
-.order(
-"name"
-);
-
-if(error){
-
-console.error(
-error
-);
-
-return;
-
-}
-
-series =
-data || [];
-
-const s =
-document.getElementById(
-"seriesId"
-);
-
-s.innerHTML =
-'<option value="">大会シリーズを選択してください</option>';
-
-series.forEach(
-x => {
-
-const o =
-document.createElement(
-"option"
-);
-
-o.value =
-x.id;
-
-o.textContent =
-x.name;
-
-s.appendChild(
-o
-);
-
-}
-);
-
-}
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "tournament_series"
+      )
+      .select(
+        "id,name"
+      );
 
 
-function changeType(){
+  if(error){
 
-const large =
-document.getElementById(
-"type"
-).value ===
-"大型大会";
+    console.error(
+      "大会シリーズ取得エラー:",
+      error
+    );
 
-document
-.getElementById(
-"storeGroup"
-)
-.classList
-.toggle(
-"hidden",
-large
-);
+    return;
 
-document
-.getElementById(
-"seriesGroup"
-)
-.classList
-.toggle(
-"hidden",
-!large
-);
+  }
+
+
+  const s =
+    document.getElementById(
+      "seriesId"
+    );
+
+
+  s.innerHTML =
+    '<option value="">大会シリーズを選択してください</option>';
+
+
+  (data || [])
+    .sort(
+      (a,b) =>
+        a.name.localeCompare(
+          b.name,
+          "ja"
+        )
+    )
+    .forEach(
+      x => {
+
+        const o =
+          document.createElement(
+            "option"
+          );
+
+
+        o.value =
+          x.id;
+
+
+        o.textContent =
+          x.name;
+
+
+        s.appendChild(o);
+
+      }
+    );
 
 }
 
 
 /* =========================
-   保存
+   戦績保存
 ========================= */
 
 async function saveResult(){
 
-if(!currentUser){
+  if(!currentUser){
 
-openAuth();
+    openAuth();
 
-return;
+    return;
 
-}
+  }
 
-const type =
-document
-.getElementById(
-"type"
-)
-.value;
 
-const date =
-document
-.getElementById(
-"date"
-)
-.value;
+  const type =
+    document
+      .getElementById(
+        "type"
+      )
+      .value;
 
-const name =
-document
-.getElementById(
-"tournamentName"
-)
-.value
-.trim();
 
-const buyIn =
-Number(
-document
-.getElementById(
-"buyIn"
-)
-.value ||
-0
-);
+  const date =
+    document
+      .getElementById(
+        "date"
+      )
+      .value;
 
-const reEntry =
-Number(
-document
-.getElementById(
-"reEntry"
-)
-.value ||
-0
-);
 
-const players =
-Number(
-document
-.getElementById(
-"players"
-)
-.value ||
-0
-);
+  const name =
+    document
+      .getElementById(
+        "tournamentName"
+      )
+      .value
+      .trim();
 
-const rank =
-Number(
-document
-.getElementById(
-"rank"
-)
-.value ||
-0
-);
 
-const itmRank =
-Number(
-document
-.getElementById(
-"itmRank"
-)
-.value ||
-0
-);
+  const buyIn =
+    Number(
+      document
+        .getElementById(
+          "buyIn"
+        )
+        .value ||
+        0
+    );
 
-const prize =
-Number(
-document
-.getElementById(
-"prize"
-)
-.value ||
-0
-);
 
-const storeId =
-document
-.getElementById(
-"storeId"
-)
-.value ||
-null;
+  const reEntry =
+    Number(
+      document
+        .getElementById(
+          "reEntry"
+        )
+        .value ||
+        0
+    );
 
-const seriesId =
-document
-.getElementById(
-"seriesId"
-)
-.value ||
-null;
 
-const memo =
-document
-.getElementById(
-"memo"
-)
-.value
-.trim() ||
-null;
+  const players =
+    Number(
+      document
+        .getElementById(
+          "players"
+        )
+        .value ||
+        0
+    );
 
-if(
-!date ||
-!name ||
-buyIn <= 0 ||
-players <= 0 ||
-rank <= 0
-){
 
-showBox(
-"message",
-"開催日・大会名・Buy-in・参加人数・順位を入力してください。",
-"error"
-);
+  const rank =
+    Number(
+      document
+        .getElementById(
+          "rank"
+        )
+        .value ||
+        0
+    );
 
-return;
 
-}
+  const itmRank =
+    Number(
+      document
+        .getElementById(
+          "itmRank"
+        )
+        .value ||
+        0
+    );
 
-if(
-type ===
-"店舗トーナメント" &&
-!storeId
-){
 
-showBox(
-"message",
-"店舗を選択してください。",
-"error"
-);
+  const prize =
+    Number(
+      document
+        .getElementById(
+          "prize"
+        )
+        .value ||
+        0
+    );
 
-return;
 
-}
+  const storeId =
+    document
+      .getElementById(
+        "storeId"
+      )
+      .value ||
+      null;
 
-if(
-type ===
-"大型大会" &&
-!seriesId
-){
 
-showBox(
-"message",
-"大会シリーズを選択してください。",
-"error"
-);
+  const seriesId =
+    document
+      .getElementById(
+        "seriesId"
+      )
+      .value ||
+      null;
 
-return;
 
-}
+  const memo =
+    document
+      .getElementById(
+        "memo"
+      )
+      .value
+      .trim() ||
+      null;
 
-const b =
-document.querySelector(
-"#formSection .save-button"
-);
 
-b.disabled =
-true;
+  /*
+    必須項目
+  */
 
-b.textContent =
-"保存中...";
+  if(
+    !date ||
+    !name ||
+    buyIn < 0 ||
+    players <= 0 ||
+    rank <= 0
+  ){
 
-const {
-error
-} =
-await supabaseClient
-.from(
-"poker_results"
-)
-.insert({
-user_id:
-currentUser.id,
-date,
-type,
-series_id:
-type === "大型大会"
-? seriesId
-: null,
-store_id:
-type === "店舗トーナメント"
-? storeId
-: null,
-tournament_name:
-name,
-buy_in:
-buyIn,
-re_entry:
-reEntry,
-players,
-rank,
-itm_rank:
-itmRank,
-prize,
-memo,
-photo_url:
-currentTournamentPhotoUrl
-});
+    showBox(
+      "message",
+      "開催日・大会名・参加人数・順位を入力してください。Buy-inは0円でも登録できます。",
+      "error"
+    );
 
-b.disabled =
-false;
+    return;
 
-b.textContent =
-"💾 戦績を保存";
+  }
 
-if(error){
 
-console.error(
-error
-);
+  /*
+    店舗大会
+  */
 
-showBox(
-"message",
-getDatabaseErrorMessage(
-error,
-"戦績の保存"
-),
-"error"
-);
+  if(
+    type ===
+    "店舗トーナメント" &&
+    !storeId
+  ){
 
-return;
+    showBox(
+      "message",
+      "店舗を選択してください。",
+      "error"
+    );
 
-}
+    return;
 
-showBox(
-"message",
-"🎉 戦績を保存しました！",
-"success"
-);
+  }
 
-showCelebrate(
-`「${name}」の戦績を記録しました！`
-);
 
-[
-"tournamentName",
-"buyIn",
-"players",
-"rank",
-"itmRank",
-"prize",
-"memo"
-]
-.forEach(
-id =>
-document
-.getElementById(
-id
-)
-.value =
-""
-);
+  /*
+    大型大会
+  */
 
-document
-.getElementById(
-"reEntry"
-)
-.value =
-"0";
+  if(
+    type ===
+    "大型大会" &&
+    !seriesId
+  ){
 
-currentTournamentPhotoUrl =
-null;
+    showBox(
+      "message",
+      "大会シリーズを選択してください。",
+      "error"
+    );
 
-document
-.getElementById(
-"photoLibraryInput"
-)
-.value =
-"";
+    return;
 
-document
-.getElementById(
-"cameraInput"
-)
-.value =
-"";
+  }
 
-document
-.getElementById(
-"photoPreview"
-)
-.classList
-.remove(
-"show"
-);
 
-await loadResults();
+  const b =
+    document.querySelector(
+      "#formSection .save-button"
+    );
 
-await loadRanking(
-"month"
-);
+
+  b.disabled =
+    true;
+
+
+  b.textContent =
+    "保存中...";
+
+
+  const payload = {
+
+    user_id:
+      currentUser.id,
+
+    date,
+
+    type,
+
+    series_id:
+      seriesId,
+
+    store_id:
+      storeId,
+
+    tournament_name:
+      name,
+
+    buy_in:
+      buyIn,
+
+    re_entry:
+      reEntry,
+
+    players,
+
+    rank,
+
+    itm_rank:
+      itmRank,
+
+    prize,
+
+    memo,
+
+    photo_url:
+      currentTournamentPhotoUrl ||
+      null
+
+  };
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .insert(
+        payload
+      );
+
+
+  b.disabled =
+    false;
+
+
+  b.textContent =
+    "💾 戦績を保存";
+
+
+  if(error){
+
+    console.error(
+      "戦績保存エラー:",
+      error
+    );
+
+
+    showBox(
+      "message",
+      getDatabaseErrorMessage(
+        error,
+        "戦績の保存"
+      ),
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showBox(
+    "message",
+    "🎉 戦績を保存しました！",
+    "success"
+  );
+
+
+  showCelebrate(
+    `「${name}」の戦績を記録しました！`
+  );
+
+
+  [
+    "tournamentName",
+    "buyIn",
+    "players",
+    "rank",
+    "itmRank",
+    "prize",
+    "memo"
+  ]
+    .forEach(
+      id => {
+
+        const el =
+          document.getElementById(
+            id
+          );
+
+
+        if(el){
+
+          el.value =
+            "";
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "reEntry"
+    )
+    .value =
+      "0";
+
+
+  currentTournamentPhotoUrl =
+    null;
+
+
+  document
+    .getElementById(
+      "photoLibraryInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "cameraInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "photoPreview"
+    )
+    .classList
+    .remove(
+      "show"
+    );
+
+
+  await loadResults();
+
+  await loadRanking(
+    "month"
+  );
 
 }
 
@@ -3453,166 +4014,225 @@ await loadRanking(
 
 async function loadResults(){
 
-if(!currentUser)return;
+  if(!currentUser){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from(
-"poker_results"
-)
-.select(
-"*,poker_stores(name,location),tournament_series(name)"
-)
-.eq(
-"user_id",
-currentUser.id
-)
-.order(
-"date",
-{
-ascending:false
-}
-);
+    return;
 
-if(error){
+  }
 
-console.error(
-error
-);
 
-showBox(
-"message",
-getDatabaseErrorMessage(
-error,
-"戦績の取得"
-),
-"error"
-);
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "date",
+        {
+          ascending:false
+        }
+      );
 
-return;
 
-}
+  if(error){
 
-allResults =
-data || [];
+    console.error(
+      "戦績取得エラー:",
+      error
+    );
 
-updateStats(
-allResults
-);
 
-renderHistory(
-allResults
-);
+    showBox(
+      "message",
+      getDatabaseErrorMessage(
+        error,
+        "戦績の取得"
+      ),
+      "error"
+    );
 
-updateAnalysis(
-allResults
-);
 
-updateBadges(
-allResults
-);
+    return;
 
-updateStreak(
-allResults
-);
+  }
 
-renderGoalProgress(
-{}
-);
+
+  allResults =
+    data || [];
+
+
+  updateStats(
+    allResults
+  );
+
+
+  renderHistory(
+    allResults
+  );
+
+
+  updateAnalysis(
+    allResults
+  );
+
+
+  updateBadges(
+    allResults
+  );
+
+
+  updateStreak(
+    allResults
+  );
 
 }
 
 
 /* =========================
-   統計
+   集計
 ========================= */
 
+function costOf(r){
+
+  return Number(
+    r.buy_in || 0
+  ) *
+  (
+    1 +
+    Number(
+      r.re_entry || 0
+    )
+  );
+
+}
+
+
+function profitOf(r){
+
+  return Number(
+    r.prize || 0
+  ) -
+  costOf(r);
+
+}
+
+
 function updateStats(
-results
+  results
 ){
 
-let itm = 0;
-let cost = 0;
-let prize = 0;
+  let itm =
+    0;
 
-results.forEach(
-r => {
 
-cost +=
-costOf(r);
+  let cost =
+    0;
 
-prize +=
-Number(
-r.prize || 0
-);
 
-if(
-isItm(r)
-){
+  let prize =
+    0;
 
-itm++;
 
-}
+  results.forEach(
+    r => {
 
-}
-);
+      cost +=
+        costOf(r);
 
-const profit =
-prize -
-cost;
 
-const roi =
-cost
-? profit /
-cost *
-100
-: 0;
+      prize +=
+        Number(
+          r.prize || 0
+        );
 
-document
-.getElementById(
-"totalGames"
-)
-.textContent =
-results.length;
 
-document
-.getElementById(
-"itmRate"
-)
-.textContent =
-(
-results.length
-? itm /
-results.length *
-100
-: 0
-)
-.toFixed(
-1
-) +
-"%";
+      if(
+        Number(
+          r.itm_rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) <=
+        Number(
+          r.itm_rank
+        )
+      ){
 
-document
-.getElementById(
-"roi"
-)
-.textContent =
-roi.toFixed(
-1
-) +
-"%";
+        itm++;
 
-document
-.getElementById(
-"profit"
-)
-.textContent =
-yen(
-profit
-);
+      }
+
+    }
+  );
+
+
+  const profit =
+    prize -
+    cost;
+
+
+  const roi =
+    cost
+      ? profit /
+        cost *
+        100
+      : 0;
+
+
+  document
+    .getElementById(
+      "totalGames"
+    )
+    .textContent =
+      results.length;
+
+
+  document
+    .getElementById(
+      "itmRate"
+    )
+    .textContent =
+      (
+        results.length
+          ? itm /
+            results.length *
+            100
+          : 0
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "roi"
+    )
+    .textContent =
+      roi.toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "profit"
+    )
+    .textContent =
+      "¥" +
+      profit.toLocaleString();
 
 }
 
@@ -3622,163 +4242,298 @@ profit
 ========================= */
 
 function renderHistory(
-results
+  results
 ){
 
-const el =
-document.getElementById(
-"historyList"
-);
+  const el =
+    document.getElementById(
+      "historyList"
+    );
 
-if(
-!results.length
-){
 
-el.innerHTML =
-'<div class="loading">まだ戦績がありません。</div>';
+  if(!results.length){
 
-return;
+    el.innerHTML =
+      '<div class="loading">まだ戦績がありません。</div>';
+
+    return;
+
+  }
+
+
+  el.innerHTML =
+    results
+      .map(
+        r => {
+
+          const p =
+            profitOf(r);
+
+
+          const itm =
+            Number(
+              r.itm_rank
+            ) > 0 &&
+            Number(
+              r.rank
+            ) <=
+            Number(
+              r.itm_rank
+            );
+
+
+          return `
+
+            <div class="result-row">
+
+              ${
+                r.photo_url
+                  ? `
+
+                    <div class="history-photo">
+
+                      <img
+                        src="${esc(r.photo_url)}"
+                        alt="大会写真"
+                        onclick="window.open('${esc(r.photo_url)}','_blank')"
+                      >
+
+                      <span class="photo-label">
+                        📷 大会写真
+                      </span>
+
+                    </div>
+
+                  `
+                  : ""
+              }
+
+
+              <div class="result-main">
+
+                <strong>
+                  ${esc(
+                    r.tournament_name ||
+                    "-"
+                  )}
+                </strong>
+
+                <span class="muted">
+                  ${r.date || ""}
+                  ・
+                  ${r.type || ""}
+                </span>
+
+              </div>
+
+
+              <div>
+
+                ${r.rank || "-"}位
+                /
+                ${r.players || "-"}人
+
+              </div>
+
+
+              <div>
+
+                ${
+                  itm
+                    ? "🎯 ITM"
+                    : "-"
+                }
+
+              </div>
+
+
+              <div
+                class="${
+                  p >= 0
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  p >= 0
+                    ? "+"
+                    : ""
+                }
+
+                ¥${p.toLocaleString()}
+
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  class="edit-button"
+                  onclick="openEditResult('${esc(r.id)}')"
+                >
+                  ✏️ 編集
+                </button>
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================
+   戦績編集
+========================= */
+
+function openEditResult(id){
+
+  if(!currentUser){
+    openAuth();
+    return;
+  }
+
+  const result =
+    allResults.find(
+      r => String(r.id) === String(id)
+    );
+
+  if(!result){
+    return;
+  }
+
+  document.getElementById("editId").value = result.id || "";
+  document.getElementById("editTournamentName").value = result.tournament_name || "";
+  document.getElementById("editDate").value = result.date || "";
+  document.getElementById("editBuyIn").value = Number(result.buy_in || 0);
+  document.getElementById("editReEntry").value = Number(result.re_entry || 0);
+  document.getElementById("editPlayers").value = Number(result.players || 0);
+  document.getElementById("editRank").value = Number(result.rank || 0);
+  document.getElementById("editItmRank").value = Number(result.itm_rank || 0);
+  document.getElementById("editPrize").value = Number(result.prize || 0);
+  document.getElementById("editMemo").value = result.memo || "";
+  document.getElementById("editMessage").className = "message";
+  document.getElementById("editMessage").textContent = "";
+
+  document.getElementById("editModal").classList.add("show");
+}
+
+
+function closeEditModal(){
+
+  document.getElementById("editModal").classList.remove("show");
 
 }
 
-el.innerHTML =
-results
-.map(
-r => {
 
-const p =
-profitOf(r);
+async function saveEditedResult(){
 
-const storeName =
-r.poker_stores?.name ||
-"";
+  if(!currentUser){
+    openAuth();
+    return;
+  }
 
-const storeLocation =
-r.poker_stores?.location ||
-"";
+  const id =
+    document.getElementById("editId").value;
 
-const seriesName =
-r.tournament_series?.name ||
-"";
+  const tournament_name =
+    document.getElementById("editTournamentName").value.trim();
 
-const place =
-r.type ===
-"店舗トーナメント"
+  const date =
+    document.getElementById("editDate").value;
 
-? (
-storeName
-? `🏪 ${storeName}${
-storeLocation
-? `（${storeLocation}）`
-: ""
-}`
-: "🏪 店舗未設定"
-)
+  const buy_in =
+    Number(document.getElementById("editBuyIn").value || 0);
 
-: (
-seriesName
-? `🏆 ${seriesName}`
-: "🏆 大型大会"
-);
+  const re_entry =
+    Number(document.getElementById("editReEntry").value || 0);
 
-return `
+  const players =
+    Number(document.getElementById("editPlayers").value || 0);
 
-<div class="result-row">
+  const rank =
+    Number(document.getElementById("editRank").value || 0);
 
-${
-r.photo_url
-? `
-<div class="history-photo">
+  const itm_rank =
+    Number(document.getElementById("editItmRank").value || 0);
 
-<img
-src="${esc(r.photo_url)}"
-alt="大会写真"
-onclick="window.open('${esc(r.photo_url)}','_blank')"
->
+  const prize =
+    Number(document.getElementById("editPrize").value || 0);
 
-<span class="photo-label">
-📷 大会写真
-</span>
+  const memo =
+    document.getElementById("editMemo").value.trim() || null;
 
-</div>
-`
-: ""
-}
+  if(
+    !id ||
+    !date ||
+    !tournament_name ||
+    buy_in < 0 ||
+    re_entry < 0 ||
+    players <= 0 ||
+    rank <= 0 ||
+    itm_rank < 0 ||
+    prize < 0
+  ){
+    showBox(
+      "editMessage",
+      "入力内容を確認してください。Buy-inは0円でも登録できます。",
+      "error"
+    );
+    return;
+  }
 
-<div class="result-main">
+  const button =
+    document.querySelector("#editModal .save-button");
 
-<strong>
-${esc(
-r.tournament_name ||
-"-"
-)}
-</strong>
+  button.disabled = true;
+  button.textContent = "保存中...";
 
-<span class="muted">
-${esc(
-r.date ||
-""
-)}
-・
-${esc(
-r.type ||
-""
-)}
-</span>
+  const { error } =
+    await supabaseClient
+      .from("poker_results")
+      .update({
+        date,
+        tournament_name,
+        buy_in,
+        re_entry,
+        players,
+        rank,
+        itm_rank,
+        prize,
+        memo
+      })
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
 
-<div class="history-store">
-${esc(place)}
-</div>
+  button.disabled = false;
+  button.textContent = "💾 変更を保存";
 
-</div>
+  if(error){
+    console.error("戦績更新エラー:", error);
+    showBox(
+      "editMessage",
+      getDatabaseErrorMessage(error, "戦績の更新"),
+      "error"
+    );
+    return;
+  }
 
-<div>
-${r.rank || "-"}位 /
-${r.players || "-"}人
-</div>
+  showBox(
+    "editMessage",
+    "✅ 戦績を更新しました。",
+    "success"
+  );
 
-<div>
-${
-isItm(r)
-? "🎯 ITM"
-: "-"
-}
-</div>
+  await loadResults();
 
-<div
-class="${
-p >= 0
-? "positive"
-: "negative"
-}"
->
-${
-p >= 0
-? "+"
-: ""
-}
-${yen(p)}
-</div>
-
-<div class="history-actions">
-
-<button
-class="edit-button"
-onclick="openEditResult('${esc(r.id)}')"
->
-✏️ 編集
-</button>
-
-</div>
-
-</div>
-
-`;
-
-}
-)
-.join("");
-
+  setTimeout(
+    closeEditModal,
+    500
+  );
 }
 
 
@@ -3787,1035 +4542,513 @@ onclick="openEditResult('${esc(r.id)}')"
 ========================= */
 
 async function loadRanking(
-period = "month",
-btn = null
+  period = "month",
+  btn = null
 ){
 
-if(btn){
+  if(btn){
 
-btn.parentElement
-.querySelectorAll(
-".tab"
-)
-.forEach(
-x =>
-x.classList.remove(
-"active"
-)
-);
+    btn.parentElement
+      .querySelectorAll(
+        ".tab"
+      )
+      .forEach(
+        x =>
+          x.classList.remove(
+            "active"
+          )
+      );
 
-btn.classList.add(
-"active"
-);
 
-}
+    btn.classList.add(
+      "active"
+    );
 
-if(!currentUser){
+  }
 
-renderRanking([]);
 
-return;
+  if(!currentUser){
 
-}
+    document
+      .getElementById(
+        "rankingList"
+      )
+      .innerHTML =
+        '<div class="loading">ログインするとランキングを確認できます。</div>';
 
-const now =
-new Date();
+    return;
 
-const start =
-period === "month"
+  }
 
-? new Date(
-now.getFullYear(),
-now.getMonth(),
-1
-)
 
-: new Date(
-now.getFullYear(),
-0,
-1
-);
+  const now =
+    new Date();
 
-const startDate =
-`${start.getFullYear()}-${String(
-start.getMonth()+1
-).padStart(
-2,
-"0"
-)}-${String(
-start.getDate()
-).padStart(
-2,
-"0"
-)}`;
 
-const {
-data,
-error
-} =
-await supabaseClient
-.rpc(
-"get_player_ranking",
-{
-p_start_date:
-startDate
-}
-);
+  const start =
+    period === "month"
 
-if(error){
+      ? new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1
+        )
 
-console.error(
-"ランキング取得エラー:",
-error
-);
+      : new Date(
+          now.getFullYear(),
+          0,
+          1
+        );
 
-document
-.getElementById(
-"rankingList"
-)
-.innerHTML =
-'<div class="message error" style="display:block">ランキングを取得できませんでした。Supabaseのランキング用SQLを実行してください。</div>';
 
-return;
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "poker_results"
+      )
+      .select(
+        "user_id,prize,buy_in,re_entry,rank,profiles(display_name)"
+      )
+      .gte(
+        "date",
+        start
+          .toISOString()
+          .slice(
+            0,
+            10
+          )
+      );
 
-}
 
-renderRanking(
-(data || [])
-.map(
-r => ({
-id:
-r.user_id,
-name:
-r.display_name ||
-"プレイヤー",
-games:
-Number(
-r.games ||
-0
-),
-profit:
-Number(
-r.profit ||
-0
-)
-})
-)
-);
+  if(error){
+
+    console.error(
+      "ランキング取得エラー:",
+      error
+    );
+
+
+    document
+      .getElementById(
+        "rankingList"
+      )
+      .innerHTML =
+        '<div class="message error" style="display:block">ランキングを取得できませんでした。</div>';
+
+
+    return;
+
+  }
+
+
+  const map = {};
+
+
+  (data || [])
+    .forEach(
+      r => {
+
+        const id =
+          r.user_id;
+
+
+        if(!id){
+
+          return;
+
+        }
+
+
+        if(!map[id]){
+
+          map[id] = {
+
+            id,
+
+            name:
+              r.profiles?.display_name ||
+              "プレイヤー",
+
+            games:
+              0,
+
+            profit:
+              0
+
+          };
+
+        }
+
+
+        map[id].games++;
+
+
+        map[id].profit +=
+          Number(
+            r.prize || 0
+          ) -
+          Number(
+            r.buy_in || 0
+          ) *
+          (
+            1 +
+            Number(
+              r.re_entry || 0
+            )
+          );
+
+      }
+    );
+
+
+  renderRanking(
+    Object
+      .values(map)
+      .sort(
+        (a,b) =>
+          b.profit -
+          a.profit
+      )
+  );
 
 }
 
 
 function renderRanking(
-rows
+  rows
 ){
 
-const el =
-document.getElementById(
-"rankingList"
-);
+  const el =
+    document.getElementById(
+      "rankingList"
+    );
 
-if(
-!rows.length
-){
 
-el.innerHTML =
-'<div class="loading">まだランキングデータがありません。</div>';
+  if(!rows.length){
 
-return;
+    el.innerHTML =
+      '<div class="loading">まだランキングデータがありません。</div>';
 
-}
+    return;
 
-el.innerHTML =
-rows
-.slice(
-0,
-50
-)
-.map(
-(r,i) => `
+  }
 
-<div class="rank-row">
 
-<div class="rank-no">
-${i + 1}
-</div>
+  el.innerHTML =
+    rows
+      .slice(
+        0,
+        50
+      )
+      .map(
+        (r,i) => `
 
-<div>
+          <div class="rank-row">
 
-<span class="rank-name">
-${esc(r.name)}
+            <div class="rank-no">
+              ${i + 1}
+            </div>
 
-${
-r.id ===
-currentUser?.id
-? '<span class="ranking-me">あなた</span>'
-: ""
-}
 
-</span>
+            <div>
 
-<span class="muted">
-${r.games}大会
-</span>
+              <span class="rank-name">
+                ${esc(r.name)}
+              </span>
 
-</div>
+              <span class="muted">
+                ${r.games}大会
+              </span>
 
-<div
-class="${
-r.profit >= 0
-? "positive"
-: "negative"
-}"
->
+            </div>
 
-${
-r.profit >= 0
-? "+"
-: ""
-}
 
-${yen(r.profit)}
+            <div
+              class="${
+                r.profit >= 0
+                  ? "positive"
+                  : "negative"
+              }"
+            >
 
-</div>
+              ${
+                r.profit >= 0
+                  ? "+"
+                  : ""
+              }
 
-<div>
-利益順
-</div>
+              ¥${r.profit.toLocaleString()}
 
-</div>
+            </div>
 
-`
-)
-.join("");
+
+            <div>
+              利益順
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
 
 }
 
 
 /* =========================
-   分析
+   詳細分析
 ========================= */
 
 function updateAnalysis(
-results
+  results
 ){
 
-const n =
-results.length;
-
-const avgRank =
-n
-? results.reduce(
-(s,r) =>
-s +
-Number(
-r.rank ||
-0
-),
-0
-) /
-n
-: 0;
-
-const avgPlayers =
-n
-? results.reduce(
-(s,r) =>
-s +
-Number(
-r.players ||
-0
-),
-0
-) /
-n
-: 0;
-
-const roiFor =
-type => {
-
-const a =
-results.filter(
-r =>
-r.type ===
-type
-);
-
-const c =
-a.reduce(
-(s,r) =>
-s +
-costOf(r),
-0
-);
-
-const p =
-a.reduce(
-(s,r) =>
-s +
-profitOf(r),
-0
-);
-
-return c
-? p /
-c *
-100
-: 0;
-
-};
-
-document
-.getElementById(
-"avgRank"
-)
-.textContent =
-n
-? avgRank.toFixed(
-1
-) +
-"位"
-: "-";
-
-document
-.getElementById(
-"avgPlayers"
-)
-.textContent =
-n
-? avgPlayers.toFixed(
-0
-) +
-"人"
-: "-";
-
-document
-.getElementById(
-"largeRoi"
-)
-.textContent =
-roiFor(
-"大型大会"
-)
-.toFixed(
-1
-) +
-"%";
-
-document
-.getElementById(
-"storeRoi"
-)
-.textContent =
-roiFor(
-"店舗トーナメント"
-)
-.toFixed(
-1
-) +
-"%";
-
-document
-.getElementById(
-"bestRank"
-)
-.textContent =
-n
-? Math.min(
-...results.map(
-r =>
-Number(
-r.rank ||
-999
-)
-)
-) +
-"位"
-: "-";
-
-document
-.getElementById(
-"bestProfit"
-)
-.textContent =
-n
-? yen(
-Math.max(
-...results.map(
-profitOf
-)
-)
-)
-: "-";
-
-
-const groups = {};
-
-results
-.filter(
-r =>
-r.type ===
-"店舗トーナメント"
-)
-.forEach(
-r => {
-
-const id =
-r.store_id ||
-"unknown";
-
-const name =
-r.poker_stores?.name ||
-"店舗未設定";
-
-const location =
-r.poker_stores?.location ||
-"";
-
-if(
-!groups[id]
-){
-
-groups[id] = {
-
-name,
-location,
-games:0,
-profit:0,
-cost:0
-
-};
-
-}
-
-groups[id].games++;
-
-groups[id].profit +=
-profitOf(r);
-
-groups[id].cost +=
-costOf(r);
-
-}
-);
-
-
-const storeRows =
-Object
-.values(
-groups
-)
-.sort(
-(a,b) =>
-b.profit -
-a.profit
-)
-.map(
-v => {
-
-const roi =
-v.cost
-? v.profit /
-v.cost *
-100
-: 0;
-
-return `
-
-<div class="mini">
-
-<strong>
-🏪 ${esc(v.name)}
-</strong>
-
-${
-v.location
-? `
-<div class="muted">
-${esc(v.location)}
-</div>
-`
-: ""
-}
-
-<div class="muted">
-${v.games}大会
-</div>
-
-<div
-class="${
-v.profit >= 0
-? "positive"
-: "negative"
-}"
->
-
-${
-v.profit >= 0
-? "+"
-: ""
-}
-
-${yen(v.profit)}
-
-</div>
-
-<div class="muted">
-ROI ${roi.toFixed(1)}%
-</div>
-
-</div>
-
-`;
-
-}
-)
-.join("");
-
-document
-.getElementById(
-"storeAnalysis"
-)
-.innerHTML =
-storeRows ||
-'<div class="loading">店舗トーナメントのデータがありません。</div>';
-
-}
-
-
-/* =========================
-   編集
-========================= */
-
-function fillEditSelects(){
-
-const store =
-document.getElementById(
-"editStoreId"
-);
-
-const seriesEl =
-document.getElementById(
-"editSeriesId"
-);
-
-store.innerHTML =
-'<option value="">店舗を選択してください</option>';
-
-stores.forEach(
-x => {
-
-const o =
-document.createElement(
-"option"
-);
-
-o.value =
-x.id;
-
-o.textContent =
-x.location
-? `${x.name}（${x.location}）`
-: x.name;
-
-store.appendChild(
-o
-);
-
-}
-);
-
-seriesEl.innerHTML =
-'<option value="">大会シリーズを選択してください</option>';
-
-series.forEach(
-x => {
-
-const o =
-document.createElement(
-"option"
-);
-
-o.value =
-x.id;
-
-o.textContent =
-x.name;
-
-seriesEl.appendChild(
-o
-);
-
-}
-);
-
-}
-
-
-function changeEditType(){
-
-const large =
-document
-.getElementById(
-"editType"
-)
-.value ===
-"大型大会";
-
-document
-.getElementById(
-"editStoreGroup"
-)
-.classList
-.toggle(
-"hidden",
-large
-);
-
-document
-.getElementById(
-"editSeriesGroup"
-)
-.classList
-.toggle(
-"hidden",
-!large
-);
-
-}
-
-
-function openEditResult(
-id
-){
-
-if(!currentUser){
-
-openAuth();
-
-return;
-
-}
-
-const r =
-allResults.find(
-x =>
-x.id ===
-id
-);
-
-if(!r)return;
-
-editingResultId =
-id;
-
-fillEditSelects();
-
-document
-.getElementById(
-"editType"
-)
-.value =
-r.type ||
-"店舗トーナメント";
-
-document
-.getElementById(
-"editStoreId"
-)
-.value =
-r.store_id ||
-"";
-
-document
-.getElementById(
-"editSeriesId"
-)
-.value =
-r.series_id ||
-"";
-
-document
-.getElementById(
-"editTournamentName"
-)
-.value =
-r.tournament_name ||
-"";
-
-document
-.getElementById(
-"editDate"
-)
-.value =
-r.date ||
-"";
-
-document
-.getElementById(
-"editBuyIn"
-)
-.value =
-r.buy_in ||
-0;
-
-document
-.getElementById(
-"editReEntry"
-)
-.value =
-r.re_entry ||
-0;
-
-document
-.getElementById(
-"editPlayers"
-)
-.value =
-r.players ||
-0;
-
-document
-.getElementById(
-"editRank"
-)
-.value =
-r.rank ||
-0;
-
-document
-.getElementById(
-"editItmRank"
-)
-.value =
-r.itm_rank ||
-"";
-
-document
-.getElementById(
-"editPrize"
-)
-.value =
-r.prize ||
-0;
-
-document
-.getElementById(
-"editMemo"
-)
-.value =
-r.memo ||
-"";
-
-document
-.getElementById(
-"editMessage"
-)
-.className =
-"message";
-
-document
-.getElementById(
-"editMessage"
-)
-.textContent =
-"";
-
-changeEditType();
-
-document
-.getElementById(
-"editModal"
-)
-.classList
-.add(
-"show"
-);
-
-}
-
-
-function closeEditModal(){
-
-document
-.getElementById(
-"editModal"
-)
-.classList
-.remove(
-"show"
-);
-
-editingResultId =
-null;
-
-}
-
-
-async function saveEditedResult(){
-
-if(
-!currentUser ||
-!editingResultId
-){
-
-return;
-
-}
-
-const type =
-document
-.getElementById(
-"editType"
-)
-.value;
-
-const date =
-document
-.getElementById(
-"editDate"
-)
-.value;
-
-const name =
-document
-.getElementById(
-"editTournamentName"
-)
-.value
-.trim();
-
-const buyIn =
-Number(
-document
-.getElementById(
-"editBuyIn"
-)
-.value ||
-0
-);
-
-const reEntry =
-Number(
-document
-.getElementById(
-"editReEntry"
-)
-.value ||
-0
-);
-
-const players =
-Number(
-document
-.getElementById(
-"editPlayers"
-)
-.value ||
-0
-);
-
-const rank =
-Number(
-document
-.getElementById(
-"editRank"
-)
-.value ||
-0
-);
-
-const itmRank =
-Number(
-document
-.getElementById(
-"editItmRank"
-)
-.value ||
-0
-);
-
-const prize =
-Number(
-document
-.getElementById(
-"editPrize"
-)
-.value ||
-0
-);
-
-const storeId =
-document
-.getElementById(
-"editStoreId"
-)
-.value ||
-null;
-
-const seriesId =
-document
-.getElementById(
-"editSeriesId"
-)
-.value ||
-null;
-
-const memo =
-document
-.getElementById(
-"editMemo"
-)
-.value
-.trim() ||
-null;
-
-if(
-!date ||
-!name ||
-buyIn <= 0 ||
-players <= 0 ||
-rank <= 0
-){
-
-showBox(
-"editMessage",
-"開催日・大会名・Buy-in・参加人数・順位を入力してください。",
-"error"
-);
-
-return;
-
-}
-
-if(
-type ===
-"店舗トーナメント" &&
-!storeId
-){
-
-showBox(
-"editMessage",
-"店舗を選択してください。",
-"error"
-);
-
-return;
-
-}
-
-if(
-type ===
-"大型大会" &&
-!seriesId
-){
-
-showBox(
-"editMessage",
-"大会シリーズを選択してください。",
-"error"
-);
-
-return;
-
-}
-
-const payload = {
-
-date,
-
-type,
-
-series_id:
-type ===
-"大型大会"
-? seriesId
-: null,
-
-store_id:
-type ===
-"店舗トーナメント"
-? storeId
-: null,
-
-tournament_name:
-name,
-
-buy_in:
-buyIn,
-
-re_entry:
-reEntry,
-
-players,
-
-rank,
-
-itm_rank:
-itmRank ||
-null,
-
-prize,
-
-memo
-
-};
-
-const {
-error
-} =
-await supabaseClient
-.from(
-"poker_results"
-)
-.update(
-payload
-)
-.eq(
-"id",
-editingResultId
-)
-.eq(
-"user_id",
-currentUser.id
-);
-
-if(error){
-
-console.error(
-"戦績編集エラー:",
-error
-);
-
-showBox(
-"editMessage",
-getDatabaseErrorMessage(
-error,
-"戦績の編集"
-),
-"error"
-);
-
-return;
-
-}
-
-showBox(
-"editMessage",
-"✅ 戦績を更新しました！",
-"success"
-);
-
-await loadResults();
-
-await loadRanking(
-"month"
-);
-
-setTimeout(
-closeEditModal,
-500
-);
+  const n =
+    results.length;
+
+
+  const avgRank =
+    n
+      ? results.reduce(
+          (s,r) =>
+            s +
+            Number(
+              r.rank || 0
+            ),
+          0
+        ) /
+        n
+      : 0;
+
+
+  const avgPlayers =
+    n
+      ? results.reduce(
+          (s,r) =>
+            s +
+            Number(
+              r.players || 0
+            ),
+          0
+        ) /
+        n
+      : 0;
+
+
+  const roiFor =
+    type => {
+
+      const a =
+        results.filter(
+          r =>
+            r.type ===
+            type
+        );
+
+
+      const c =
+        a.reduce(
+          (s,r) =>
+            s +
+            costOf(r),
+          0
+        );
+
+
+      const p =
+        a.reduce(
+          (s,r) =>
+            s +
+            profitOf(r),
+          0
+        );
+
+
+      return c
+        ? p /
+          c *
+          100
+        : 0;
+
+    };
+
+
+  document
+    .getElementById(
+      "avgRank"
+    )
+    .textContent =
+      n
+        ? avgRank.toFixed(
+            1
+          ) +
+          "位"
+        : "-";
+
+
+  document
+    .getElementById(
+      "avgPlayers"
+    )
+    .textContent =
+      n
+        ? avgPlayers.toFixed(
+            0
+          ) +
+          "人"
+        : "-";
+
+
+  document
+    .getElementById(
+      "largeRoi"
+    )
+    .textContent =
+      roiFor(
+        "大型大会"
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "storeRoi"
+    )
+    .textContent =
+      roiFor(
+        "店舗トーナメント"
+      ).toFixed(
+        1
+      ) +
+      "%";
+
+
+  document
+    .getElementById(
+      "bestRank"
+    )
+    .textContent =
+      n
+        ? Math.min(
+            ...results.map(
+              r =>
+                Number(
+                  r.rank ||
+                  999
+                )
+            )
+          ) +
+          "位"
+        : "-";
+
+
+  document
+    .getElementById(
+      "bestProfit"
+    )
+    .textContent =
+      n
+        ? "¥" +
+          Math.max(
+            ...results.map(
+              profitOf
+            )
+          ).toLocaleString()
+        : "-";
+
+
+  const groups = {};
+
+
+  results.forEach(
+    r => {
+
+      const key =
+        r.type === "大型大会"
+          ? "大型大会"
+          : (storeNameMap[r.store_id] || "店舗不明");
+
+
+      if(!groups[key]){
+
+        groups[key] = {
+
+          games:0,
+
+          profit:0
+
+        };
+
+      }
+
+
+      groups[key].games++;
+
+
+      groups[key].profit +=
+        profitOf(r);
+
+    }
+  );
+
+
+  document
+    .getElementById(
+      "storeAnalysis"
+    )
+    .innerHTML =
+      Object
+        .entries(groups)
+        .map(
+          ([k,v]) => `
+
+            <div class="mini">
+
+              <strong>
+                ${
+                  esc(
+                    k ===
+                    "大型大会"
+                      ? "大型大会"
+                      : k
+                  )
+                }
+              </strong>
+
+              <div class="muted">
+                ${v.games}大会
+              </div>
+
+              <div
+                class="${
+                  v.profit >= 0
+                    ? "positive"
+                    : "negative"
+                }"
+              >
+
+                ${
+                  v.profit >= 0
+                    ? "+"
+                    : ""
+                }
+
+                ¥${v.profit.toLocaleString()}
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")
+      ||
+      '<div class="loading">データがありません。</div>';
 
 }
 
@@ -4826,140 +5059,154 @@ closeEditModal,
 
 async function loadProfile(){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from(
-"profiles"
-)
-.select("*")
-.eq(
-"id",
-currentUser.id
-)
-.maybeSingle();
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "profiles"
+      )
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
 
-if(error){
 
-console.error(
-error
-);
+  if(error){
 
-return;
+    console.error(
+      "プロフィール取得エラー:",
+      error
+    );
+
+
+    showBox(
+      "profileMessage",
+      "プロフィール情報を取得できませんでした。",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  if(data){
+
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value =
+        data.display_name ||
+        "";
+
+
+    document
+      .getElementById(
+        "profileBio"
+      )
+      .value =
+        data.bio ||
+        "";
+
+  }
 
 }
 
-if(data){
 
-document
-.getElementById(
-"profileName"
-)
-.value =
-data.display_name ||
-"";
-
-document
-.getElementById(
-"profileBio"
-)
-.value =
-data.bio ||
-"";
-
-}
-
-}
-
+/* =========================
+   プロフィール保存
+========================= */
 
 async function saveProfile(){
 
-if(!currentUser){
+  if(!currentUser){
 
-showBox(
-"profileMessage",
-"ログインしてください。",
-"error"
-);
+    showBox(
+      "profileMessage",
+      "プロフィールを保存するにはログインしてください。",
+      "error"
+    );
 
-return;
+    return;
 
-}
+  }
 
-const display_name =
-document
-.getElementById(
-"profileName"
-)
-.value
-.trim();
 
-const bio =
-document
-.getElementById(
-"profileBio"
-)
-.value
-.trim();
+  const display_name =
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value
+      .trim();
 
-const {
-error
-} =
-await supabaseClient
-.from(
-"profiles"
-)
-.upsert(
-{
-id:
-currentUser.id,
-display_name,
-bio
-},
-{
-onConflict:"id"
-}
-);
 
-if(error){
+  const bio =
+    document
+      .getElementById(
+        "profileBio"
+      )
+      .value
+      .trim();
 
-showBox(
-"profileMessage",
-getDatabaseErrorMessage(
-error,
-"プロフィールの保存"
-),
-"error"
-);
 
-return;
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "profiles"
+      )
+      .upsert(
+        {
+          id:
+            currentUser.id,
 
-}
+          display_name,
 
-await supabaseClient
-.auth
-.updateUser({
-data:{
-display_name
-}
-});
+          bio
 
-document
-.getElementById(
-"userName"
-)
-.textContent =
-display_name ||
-currentUser.email ||
-"ログイン中";
+        },
+        {
+          onConflict:"id"
+        }
+      );
 
-showBox(
-"profileMessage",
-"プロフィールを保存しました！",
-"success"
-);
+
+  if(error){
+
+    console.error(
+      "プロフィール保存エラー:",
+      error
+    );
+
+
+    showBox(
+      "profileMessage",
+      getDatabaseErrorMessage(
+        error,
+        "プロフィールの保存"
+      ),
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  showBox(
+    "profileMessage",
+    "プロフィールを保存しました！",
+    "success"
+  );
 
 }
 
@@ -4969,110 +5216,112 @@ showBox(
 ========================= */
 
 function updateBadges(
-results
+  results
 ){
 
-const n =
-results.length;
+  const n =
+    results.length;
 
-const profit =
-results.reduce(
-(s,r) =>
-s +
-profitOf(r),
-0
-);
 
-const wins =
-results.filter(
-r =>
-Number(
-r.rank
-) ===
-1
-)
-.length;
+  const profit =
+    results.reduce(
+      (s,r) =>
+        s +
+        profitOf(r),
+      0
+    );
 
-const defs = [
 
-[
-"🎯",
-"初参加",
-"1大会以上",
-n >= 1
-],
+  const wins =
+    results.filter(
+      r =>
+        Number(
+          r.rank
+        ) === 1
+    ).length;
 
-[
-"🔥",
-"10大会",
-"10大会以上",
-n >= 10
-],
 
-[
-"🏆",
-"初優勝",
-"優勝1回以上",
-wins >= 1
-],
+  const defs = [
 
-[
-"💰",
-"利益1万円",
-"累計利益1万円以上",
-profit >= 10000
-],
+    [
+      "🎯",
+      "初参加",
+      "1大会以上",
+      n >= 1
+    ],
 
-[
-"🚀",
-"50大会",
-"50大会以上",
-n >= 50
-],
+    [
+      "🔥",
+      "10大会",
+      "10大会以上",
+      n >= 10
+    ],
 
-[
-"👑",
-"100大会",
-"100大会以上",
-n >= 100
-]
+    [
+      "🏆",
+      "初優勝",
+      "優勝1回以上",
+      wins >= 1
+    ],
 
-];
+    [
+      "💰",
+      "利益1万円",
+      "累計利益1万円以上",
+      profit >= 10000
+    ],
 
-document
-.getElementById(
-"badges"
-)
-.innerHTML =
-defs
-.map(
-x => `
+    [
+      "🚀",
+      "50大会",
+      "50大会以上",
+      n >= 50
+    ],
 
-<div
-class="badge ${
-x[3]
-? "earned"
-: ""
-}"
->
+    [
+      "👑",
+      "100大会",
+      "100大会以上",
+      n >= 100
+    ]
 
-<div class="badge-icon">
-${x[0]}
-</div>
+  ];
 
-<div class="badge-name">
-${x[1]}
-</div>
 
-<div class="badge-desc">
-${x[2]}
-</div>
+  document
+    .getElementById(
+      "badges"
+    )
+    .innerHTML =
+      defs
+        .map(
+          x => `
 
-</div>
+            <div
+              class="badge ${
+                x[3]
+                  ? "earned"
+                  : ""
+              }"
+            >
 
-`
-)
-.join("");
+              <div class="badge-icon">
+                ${x[0]}
+              </div>
+
+              <div class="badge-name">
+                ${x[1]}
+              </div>
+
+              <div class="badge-desc">
+                ${x[2]}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
 
 }
 
@@ -5082,93 +5331,77 @@ ${x[2]}
 ========================= */
 
 function updateStreak(
-results
+  results
 ){
 
-if(
-!results.length
-){
+  if(!results.length){
 
-document
-.getElementById(
-"streak"
-)
-.textContent =
-"0大会";
+    document
+      .getElementById(
+        "streak"
+      )
+      .textContent =
+        "0大会";
 
-return;
+    return;
 
-}
+  }
 
-const dates =
-[
-...new Set(
-results
-.map(
-r =>
-r.date
-)
-.filter(
-Boolean
-)
-)
-]
-.sort()
-.reverse();
 
-let streak =
-0;
+  const dates =
+    [
+      ...new Set(
+        results
+          .map(
+            r =>
+              r.date
+          )
+          .filter(Boolean)
+      )
+    ]
+      .sort()
+      .reverse();
 
-for(
-let i=0;
-i<dates.length;
-i++
-){
 
-if(
-i ===
-0
-){
+  let streak =
+    0;
 
-streak++;
 
-continue;
+  for(
+    let i = 0;
+    i < dates.length;
+    i++
+  ){
 
-}
+    if(
+      i === 0 ||
+      new Date(
+        dates[i - 1]
+      ) -
+      new Date(
+        dates[i]
+      ) <=
+      86400000 * 31
+    ){
 
-const diff =
-(
-new Date(
-dates[i-1]
-) -
-new Date(
-dates[i]
-)
-) /
-86400000;
+      streak++;
 
-if(
-diff <=
-7
-){
+    }else{
 
-streak++;
+      break;
 
-}else{
+    }
 
-break;
+  }
 
-}
 
-}
-
-document
-.getElementById(
-"streak"
-)
-.textContent =
-streak +
-"大会";
+  document
+    .getElementById(
+      "streak"
+    )
+    .textContent =
+      streak +
+      "大会";
 
 }
 
@@ -5179,521 +5412,631 @@ streak +
 
 async function loadGoals(){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from(
-"player_goals"
-)
-.select("*")
-.eq(
-"user_id",
-currentUser.id
-)
-.maybeSingle();
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "player_goals"
+      )
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .maybeSingle();
 
-if(error){
 
-console.error(
-error
-);
+  if(error){
 
-return;
+    console.error(
+      "目標取得エラー:",
+      error
+    );
+
+
+    showBox(
+      "goalMessage",
+      "目標情報を取得できませんでした。",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  if(data){
+
+    document
+      .getElementById(
+        "goalGames"
+      )
+      .value =
+        data.target_games ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalProfit"
+      )
+      .value =
+        data.target_profit ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalRoi"
+      )
+      .value =
+        data.target_roi ||
+        "";
+
+
+    document
+      .getElementById(
+        "goalItm"
+      )
+      .value =
+        data.target_itm_rate ||
+        "";
+
+  }
+
+
+  renderGoalProgress(
+    data || {}
+  );
 
 }
 
-if(data){
 
-document
-.getElementById(
-"goalGames"
-)
-.value =
-data.target_games ||
-"";
-
-document
-.getElementById(
-"goalProfit"
-)
-.value =
-data.target_profit ||
-"";
-
-document
-.getElementById(
-"goalRoi"
-)
-.value =
-data.target_roi ||
-"";
-
-document
-.getElementById(
-"goalItm"
-)
-.value =
-data.target_itm_rate ||
-"";
-
-}
-
-renderGoalProgress(
-data ||
-{}
-);
-
-}
-
+/* =========================
+   目標保存
+========================= */
 
 async function saveGoals(){
 
-if(!currentUser){
+  if(!currentUser){
 
-showBox(
-"goalMessage",
-"ログインしてください。",
-"error"
-);
+    showBox(
+      "goalMessage",
+      "目標を保存するにはログインしてください。",
+      "error"
+    );
 
-return;
+    return;
 
-}
-
-const payload = {
-
-user_id:
-currentUser.id,
-
-target_games:
-Number(
-document
-.getElementById(
-"goalGames"
-)
-.value ||
-0
-),
-
-target_profit:
-Number(
-document
-.getElementById(
-"goalProfit"
-)
-.value ||
-0
-),
-
-target_roi:
-Number(
-document
-.getElementById(
-"goalRoi"
-)
-.value ||
-0
-),
-
-target_itm_rate:
-Number(
-document
-.getElementById(
-"goalItm"
-)
-.value ||
-0
-)
-
-};
-
-const {
-error
-} =
-await supabaseClient
-.from(
-"player_goals"
-)
-.upsert(
-payload,
-{
-onConflict:
-"user_id"
-}
-);
-
-if(error){
-
-showBox(
-"goalMessage",
-getDatabaseErrorMessage(
-error,
-"目標の保存"
-),
-"error"
-);
-
-return;
-
-}
-
-showBox(
-"goalMessage",
-"🎯 目標を保存しました！",
-"success"
-);
-
-renderGoalProgress(
-payload
-);
-
-}
+  }
 
 
-function renderGoalProgress(
-g
-){
+  const payload = {
 
-const year =
-new Date()
-.getFullYear();
+    user_id:
+      currentUser.id,
 
-const rs =
-allResults.filter(
-r =>
-(
-r.date ||
-""
-)
-.startsWith(
-String(
-year
-)
-)
-);
+    target_games:
+      Number(
+        document
+          .getElementById(
+            "goalGames"
+          )
+          .value ||
+          0
+      ),
 
-const profit =
-rs.reduce(
-(s,r) =>
-s +
-profitOf(r),
-0
-);
+    target_profit:
+      Number(
+        document
+          .getElementById(
+            "goalProfit"
+          )
+          .value ||
+          0
+      ),
 
-const cost =
-rs.reduce(
-(s,r) =>
-s +
-costOf(r),
-0
-);
+    target_roi:
+      Number(
+        document
+          .getElementById(
+            "goalRoi"
+          )
+          .value ||
+          0
+      ),
 
-const itm =
-rs.filter(
-isItm
-)
-.length;
+    target_itm_rate:
+      Number(
+        document
+          .getElementById(
+            "goalItm"
+          )
+          .value ||
+          0
+      )
 
-const roi =
-cost
-? profit /
-cost *
-100
-: 0;
+  };
 
-const itmRate =
-rs.length
-? itm /
-rs.length *
-100
-: 0;
 
-const item =
-(
-label,
-value,
-target
-) => `
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "player_goals"
+      )
+      .upsert(
+        payload,
+        {
+          onConflict:"user_id"
+        }
+      );
 
-<div class="mini">
 
-<div class="mini-title">
-${label}
-</div>
+  if(error){
 
-<div class="mini-value">
-${value}
-</div>
+    console.error(
+      "目標保存エラー:",
+      error
+    );
 
-<div class="progress">
 
-<div
-style="
-width:${
-target
-? Math.min(
-100,
-Math.max(
-0,
-Number(value) /
-Number(target) *
-100
-)
-)
-: 0
-}%
-"
-></div>
+    showBox(
+      "goalMessage",
+      getDatabaseErrorMessage(
+        error,
+        "目標の保存"
+      ),
+      "error"
+    );
 
-</div>
 
-</div>
+    return;
 
-`;
+  }
 
-document
-.getElementById(
-"goalProgress"
-)
-.innerHTML = `
 
-<div class="goal-grid">
+  showBox(
+    "goalMessage",
+    "🎯 目標を保存しました！",
+    "success"
+  );
 
-${item(
-"年間大会数",
-rs.length,
-g.target_games ||
-0
-)}
 
-${item(
-"年間利益",
-profit,
-g.target_profit ||
-0
-)}
-
-${item(
-"ROI",
-roi.toFixed(1),
-g.target_roi ||
-0
-)}
-
-${item(
-"ITM率",
-itmRate.toFixed(1),
-g.target_itm_rate ||
-0
-)}
-
-</div>
-
-`;
+  renderGoalProgress(
+    payload
+  );
 
 }
 
 
 /* =========================
-   エラー
+   目標進捗
+========================= */
+
+function renderGoalProgress(
+  g
+){
+
+  const year =
+    new Date()
+      .getFullYear();
+
+
+  const rs =
+    allResults.filter(
+      r =>
+        (
+          r.date ||
+          ""
+        ).startsWith(
+          String(year)
+        )
+    );
+
+
+  const profit =
+    rs.reduce(
+      (s,r) =>
+        s +
+        profitOf(r),
+      0
+    );
+
+
+  const cost =
+    rs.reduce(
+      (s,r) =>
+        s +
+        costOf(r),
+      0
+    );
+
+
+  const itm =
+    rs.filter(
+      r =>
+        Number(
+          r.itm_rank
+        ) > 0 &&
+        Number(
+          r.rank
+        ) <=
+        Number(
+          r.itm_rank
+        )
+    ).length;
+
+
+  const roi =
+    cost
+      ? profit /
+        cost *
+        100
+      : 0;
+
+
+  const itmRate =
+    rs.length
+      ? itm /
+        rs.length *
+        100
+      : 0;
+
+
+  const item =
+    (
+      label,
+      value,
+      target
+    ) => `
+
+      <div class="mini">
+
+        <div class="mini-title">
+          ${label}
+        </div>
+
+        <div class="mini-value">
+          ${value}
+        </div>
+
+        <div class="progress">
+
+          <div
+            style="
+              width:${
+                target
+                  ? Math.min(
+                      100,
+                      Number(value) /
+                      Number(target) *
+                      100
+                    )
+                  : 0
+              }%
+            "
+          ></div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+  document
+    .getElementById(
+      "goalProgress"
+    )
+    .innerHTML = `
+
+      <div class="goal-grid">
+
+        ${item(
+          "年間大会数",
+          rs.length,
+          g.target_games
+        )}
+
+        ${item(
+          "年間利益",
+          "¥" +
+          profit.toLocaleString(),
+          g.target_profit
+        )}
+
+        ${item(
+          "ROI",
+          roi.toFixed(1) +
+          "%",
+          g.target_roi
+        )}
+
+        ${item(
+          "ITM率",
+          itmRate.toFixed(1) +
+          "%",
+          g.target_itm_rate
+        )}
+
+      </div>
+
+    `;
+
+}
+
+
+/* =========================
+   エラー表示
 ========================= */
 
 function showBox(
-id,
-text,
-type
+  id,
+  text,
+  type
 ){
 
-const e =
-document.getElementById(
-id
-);
-
-if(!e)return;
-
-e.textContent =
-text;
-
-e.className =
-"message " +
-type;
-
-}
+  const e =
+    document.getElementById(
+      id
+    );
 
 
-function getAuthErrorMessage(
-error
-){
+  if(!e){
 
-const m =
-String(
-error?.message ||
-""
-)
-.toLowerCase();
+    return;
 
-if(
-m.includes(
-"invalid login credentials"
-)
-){
-
-return "メールアドレスまたはパスワードが正しくありません。";
-
-}
-
-if(
-m.includes(
-"email not confirmed"
-)
-){
-
-return "メールアドレスの確認が完了していません。";
-
-}
-
-if(
-m.includes(
-"user already registered"
-)
-){
-
-return "このメールアドレスはすでに登録されています。";
-
-}
-
-if(
-m.includes(
-"password"
-) &&
-m.includes(
-"6"
-)
-){
-
-return "パスワードは6文字以上で入力してください。";
-
-}
-
-if(
-m.includes(
-"rate limit"
-)
-){
-
-return "操作が集中しています。少し時間をおいてください。";
-
-}
-
-return "ログイン・新規登録に失敗しました。入力内容を確認してください。";
-
-}
+  }
 
 
-function getDatabaseErrorMessage(
-error,
-action
-){
+  e.textContent =
+    text;
 
-const m =
-String(
-error?.message ||
-""
-)
-.toLowerCase();
 
-if(
-m.includes(
-"row-level security"
-)
-){
-
-return `${action}に失敗しました。ログイン状態またはアクセス権限を確認してください。`;
-
-}
-
-if(
-m.includes(
-"permission denied"
-)
-){
-
-return `${action}に失敗しました。この操作を行う権限がありません。`;
-
-}
-
-if(
-m.includes(
-"duplicate"
-)
-){
-
-return `${action}に失敗しました。同じデータがすでに登録されています。`;
-
-}
-
-if(
-m.includes(
-"network"
-) ||
-m.includes(
-"fetch"
-)
-){
-
-return `${action}に失敗しました。通信環境を確認してください。`;
-
-}
-
-return `${action}に失敗しました。時間をおいてもう一度お試しください。`;
+  e.className =
+    "message " +
+    type;
 
 }
 
 
 /* =========================
-   演出
+   認証エラー
+========================= */
+
+function getAuthErrorMessage(
+  error
+){
+
+  const message =
+    String(
+      error?.message ||
+      ""
+    ).toLowerCase();
+
+
+  if(
+    message.includes(
+      "invalid login credentials"
+    )
+  ){
+
+    return "メールアドレスまたはパスワードが正しくありません。";
+
+  }
+
+
+  if(
+    message.includes(
+      "email not confirmed"
+    )
+  ){
+
+    return "メールアドレスの確認が完了していません。確認メールをご確認ください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "user already registered"
+    )
+  ){
+
+    return "このメールアドレスはすでに登録されています。ログインしてください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "password"
+    ) &&
+    message.includes(
+      "6"
+    )
+  ){
+
+    return "パスワードは6文字以上で入力してください。";
+
+  }
+
+
+  if(
+    message.includes(
+      "rate limit"
+    )
+  ){
+
+    return "操作が集中しています。少し時間をおいてからもう一度お試しください。";
+
+  }
+
+
+  return "ログイン・新規登録に失敗しました。入力内容を確認してください。";
+
+}
+
+
+/* =========================
+   DBエラー
+========================= */
+
+function getDatabaseErrorMessage(
+  error,
+  action
+){
+
+  const message =
+    String(
+      error?.message ||
+      ""
+    ).toLowerCase();
+
+
+  if(
+    message.includes(
+      "row-level security"
+    )
+  ){
+
+    return `${action}に失敗しました。ログイン状態またはアクセス権限を確認してください。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "permission denied"
+    )
+  ){
+
+    return `${action}に失敗しました。この操作を行う権限がありません。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "schema cache"
+    )
+  ){
+
+    return `${action}に失敗しました。システム設定を確認する必要があります。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "duplicate"
+    )
+  ){
+
+    return `${action}に失敗しました。同じデータがすでに登録されています。`;
+
+  }
+
+
+  if(
+    message.includes(
+      "network"
+    ) ||
+    message.includes(
+      "fetch"
+    )
+  ){
+
+    return `${action}に失敗しました。通信環境を確認してください。`;
+
+  }
+
+
+  return `${action}に失敗しました。時間をおいてもう一度お試しください。`;
+
+}
+
+
+/* =========================
+   おめでとう演出
 ========================= */
 
 function showCelebrate(
-text
+  text
 ){
 
-document
-.getElementById(
-"celebrateText"
-)
-.textContent =
-text;
+  document
+    .getElementById(
+      "celebrateText"
+    )
+    .textContent =
+      text;
 
-document
-.getElementById(
-"celebrate"
-)
-.classList
-.add(
-"show"
-);
 
-setTimeout(
-closeCelebrate,
-2200
-);
+  document
+    .getElementById(
+      "celebrate"
+    )
+    .classList
+    .add(
+      "show"
+    );
+
+
+  setTimeout(
+    closeCelebrate,
+    2200
+  );
 
 }
 
 
 function closeCelebrate(){
 
-document
-.getElementById(
-"celebrate"
-)
-.classList
-.remove(
-"show"
-);
+  document
+    .getElementById(
+      "celebrate"
+    )
+    .classList
+    .remove(
+      "show"
+    );
+
+}
+
+
+/* =========================
+   HTMLエスケープ
+========================= */
+
+function esc(
+  v
+){
+
+  return String(
+    v ?? ""
+  )
+    .replace(
+      /[&<>"']/g,
+      c =>
+        ({
+          "&":
+            "&amp;",
+          "<":
+            "&lt;",
+          ">":
+            "&gt;",
+          '"':
+            "&quot;",
+          "'":
+            "&#039;"
+        }[c])
+    );
 
 }
 
