@@ -15,11 +15,25 @@
   box-sizing:border-box
 }
 
+html{
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
 body{
   margin:0;
+  width:100%;
+  min-height:100%;
   background:#0b1020;
   color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y
 }
 
 .container{
@@ -421,6 +435,28 @@ textarea{
   border-color:#5ce6ad
 }
 
+.delete-button{
+  border:1px solid #6b3542;
+  border-radius:10px;
+  padding:9px 12px;
+  background:#2a1820;
+  color:#ff8f9e;
+  font-weight:800;
+  cursor:pointer
+}
+
+.delete-button:hover{
+  background:#421c24;
+  border-color:#ff8f9e
+}
+
+.history-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap
+}
+
 .edit-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -527,6 +563,9 @@ textarea{
 
 .modal-card{
   width:min(460px,100%);
+  max-height:90vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   background:#11192d;
   border:1px solid #3a4a6b;
   border-radius:22px;
@@ -658,6 +697,45 @@ textarea{
 
   .user-name{
     display:none
+  }
+
+  html,
+  body{
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y
+  }
+
+  .container{
+    width:94%;
+    max-width:none;
+    padding-bottom:120px
+  }
+
+  .form-section{
+    width:100%;
+    padding:20px 16px 40px
+  }
+
+  input,
+  select,
+  textarea{
+    min-height:56px;
+    font-size:17px
+  }
+
+  textarea{
+    min-height:120px
+  }
+
+  .save-button,
+  .cancel-button{
+    min-height:58px
+  }
+
+  .history-actions{
+    justify-content:flex-start
   }
 
 }
@@ -4365,7 +4443,8 @@ function renderHistory(
 
               </div>
 
-              <div>
+              <div class="history-actions">
+
                 <button
                   type="button"
                   class="edit-button"
@@ -4373,6 +4452,15 @@ function renderHistory(
                 >
                   ✏️ 編集
                 </button>
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  onclick="deleteResult('${esc(r.id)}')"
+                >
+                  🗑️ 削除
+                </button>
+
               </div>
 
             </div>
@@ -4534,6 +4622,186 @@ async function saveEditedResult(){
     closeEditModal,
     500
   );
+}
+
+
+/* =========================
+   戦績削除
+========================= */
+
+async function deleteResult(id){
+
+  if(!currentUser){
+    openAuth();
+    return;
+  }
+
+  const result =
+    allResults.find(
+      r => String(r.id) === String(id)
+    );
+
+  if(!result){
+    return;
+  }
+
+  const tournamentName =
+    result.tournament_name ||
+    "この戦績";
+
+  const confirmed =
+    window.confirm(
+      `「${tournamentName}」の戦績を削除しますか？\n\n削除すると元に戻せません。`
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("poker_results")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+    if(error){
+
+      console.error(
+        "戦績削除エラー:",
+        error
+      );
+
+      showBox(
+        "message",
+        getDatabaseErrorMessage(
+          error,
+          "戦績の削除"
+        ),
+        "error"
+      );
+
+      return;
+    }
+
+    /*
+      戦績に大会写真が紐づいている場合、
+      Storage上の写真も削除する。
+      写真削除に失敗しても戦績削除自体は成功扱いにする。
+    */
+
+    if(result.photo_url){
+
+      try{
+
+        const photoPath =
+          getPhotoStoragePath(
+            result.photo_url
+          );
+
+        if(photoPath){
+
+          const {
+            error: photoDeleteError
+          } =
+            await supabaseClient
+              .storage
+              .from("tournament-photos")
+              .remove([photoPath]);
+
+          if(photoDeleteError){
+
+            console.warn(
+              "大会写真の削除に失敗しました:",
+              photoDeleteError
+            );
+
+          }
+
+        }
+
+      }catch(photoError){
+
+        console.warn(
+          "大会写真削除エラー:",
+          photoError
+        );
+
+      }
+
+    }
+
+    await loadResults();
+
+    await loadRanking("month");
+
+    showBox(
+      "message",
+      "🗑️ 戦績を削除しました。",
+      "success"
+    );
+
+  }catch(error){
+
+    console.error(
+      "戦績削除エラー:",
+      error
+    );
+
+    showBox(
+      "message",
+      "戦績の削除に失敗しました。時間をおいてもう一度お試しください。",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   大会写真URLからStorageパスを取得
+========================= */
+
+function getPhotoStoragePath(photoUrl){
+
+  if(!photoUrl){
+    return null;
+  }
+
+  try{
+
+    const marker =
+      "/storage/v1/object/public/tournament-photos/";
+
+    const index =
+      String(photoUrl).indexOf(marker);
+
+    if(index === -1){
+      return null;
+    }
+
+    return decodeURIComponent(
+      String(photoUrl).slice(
+        index + marker.length
+      )
+    );
+
+  }catch(error){
+
+    console.error(
+      "写真Storageパス取得エラー:",
+      error
+    );
+
+    return null;
+
+  }
+
 }
 
 
